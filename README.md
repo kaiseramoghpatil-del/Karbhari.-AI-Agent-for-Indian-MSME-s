@@ -19,7 +19,7 @@ computes Drawing Power — deterministically, never by LLM arithmetic. See
 | Graded findings (supported/unresolved/ineligible-contradicted) with evidence citations | Real |
 | Full tool-call trace (for demo narration / "how did it find that") | Real, surfaced in the UI |
 | aiKart sandbox entrypoint | Real, text-only input (no evidence upload — unchanged limitation from P0) |
-| Docker image | Built and verified against P1 code; **not rebuilt against P2** — rebuild before relying on it |
+| Docker image | **Rebuilt and verified against P2** — full 7-document investigation run inside the container, PDF extraction, reconciliation, and the aiKart sandbox entrypoint all confirmed working |
 | TReDS/banking APIs, autonomous actions, multi-agent orchestration, OCR | Not built — deliberately out of scope |
 
 ## Architecture
@@ -171,10 +171,32 @@ cd backend
 
 ## Docker
 
-Built and verified in P0/P1; **has not been rebuilt against the P2 agent
-loop / reconciliation modules**. Rebuild (`docker build -t karbhari:0.3.0 .`)
-and re-run the verification steps from the P1 README section before relying
-on it for submission.
+```bash
+docker build -t karbhari:0.3.0 .
+docker run -p 8000:8000 --env-file backend/.env karbhari:0.3.0
+```
+
+**Rebuilt and verified against P2** (image `karbhari:0.3.0`): ran the full
+7-document demo case (real PDF, two stock periods, multi-debtor invoices/
+receipts) against the running container and got the exact same
+independently-verified numbers as the host runs — eligible debtors
+₹16,00,000, calculated DP ₹44,10,000, gap ₹12,10,000, plus the duplicate/
+unallocated/aged-out findings, all correctly detected inside the container.
+Container logs were clean (no errors/warnings for this run). The aiKart
+sandbox entrypoint was re-verified the same way as P0/P1, via a
+volume-mounted `/aikart`:
+```bash
+mkdir -p aikart_test
+echo '{"message":"..."}' > aikart_test/input.json
+docker run --rm -v "$(pwd)/aikart_test:/aikart" --env-file backend/.env \
+  --entrypoint python karbhari:0.3.0 -m app.aikart.entrypoint
+```
+One caveat from this verification run specifically: the evidence files were
+uploaded without setting a `category` on each one, which meant the
+`check_consistency`-coverage-gap backstop (see Known limitations) didn't
+fire, since it keys off evidence categories. That's a property of how that
+particular test was set up, not a new bug — the web app's upload form always
+asks for a category.
 
 ## Known limitations (stated honestly, not hidden)
 
@@ -204,7 +226,6 @@ on it for submission.
 - Either accept the `check_consistency` coverage gap as a known constraint of
   the current model tier, or invest in native function-calling / a stronger
   model specifically to close it.
-- Rebuild and re-verify the Docker image against P2 before submission.
 - The "Actions" tab is still a placeholder — turning the capacity-gap finding
   into a concrete next action (e.g. a draft note to the bank) is the natural
   next increment once the investigation layer is trusted.
