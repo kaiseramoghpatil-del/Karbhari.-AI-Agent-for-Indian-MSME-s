@@ -1,30 +1,19 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import { CaseListPage } from './pages/CaseListPage'
 import { CaseWorkspacePage } from './pages/CaseWorkspacePage'
 
+// No shared chrome here on purpose: the case list is a light "lobby" screen
+// and owns its own header, while the case workspace is a full-viewport
+// console with its own persistent rail. Forcing both through one topbar
+// was exactly the kind of generic-SaaS-shell sameness this redesign moved
+// away from.
 function App() {
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link to="/" className="home-link">
-          <span className="brand-mark">क</span>
-          <div className="brand-text">
-            <h1>
-              KARBHARI <span className="hindi">कारभारी</span>
-            </h1>
-            <p>Working Capital Guardian</p>
-          </div>
-        </Link>
-      </header>
-
-      <main className="main">
-        <Routes>
-          <Route path="/" element={<CaseListPage />} />
-          <Route path="/cases/:caseId" element={<CaseWorkspacePage />} />
-        </Routes>
-      </main>
-    </div>
+    <Routes>
+      <Route path="/" element={<CaseListPage />} />
+      <Route path="/cases/:caseId" element={<CaseWorkspacePage />} />
+    </Routes>
   )
 }
 

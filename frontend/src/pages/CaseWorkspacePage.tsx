@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
-import { Tabs } from '../components/Tabs'
+import { SidebarNav } from '../components/SidebarNav'
 import { EvidenceUploader } from '../components/EvidenceUploader'
 import { EvidenceList } from '../components/EvidenceList'
 import { ReconciliationCard } from '../components/ReconciliationCard'
@@ -9,13 +9,14 @@ import { DebtorReconciliationCard } from '../components/DebtorReconciliationCard
 import { FindingsList } from '../components/FindingsList'
 import { ToolTrace } from '../components/ToolTrace'
 import { WorkingCapitalHero } from '../components/WorkingCapitalHero'
+import { DottedGlowBackground } from '../components/DottedGlowBackground'
 import type { Case, Evidence, Investigation } from '../types'
 
 // Ordered to match the product's real visual hierarchy: the graded
 // discoveries first, the math/detail behind them second, the raw evidence
 // that feeds it third, how the investigation got there fourth, and
 // corrective actions last.
-const TABS = [
+const NAV_ITEMS = [
   { key: 'findings', label: 'Findings' },
   { key: 'investigation', label: 'Investigation' },
   { key: 'evidence', label: 'Evidence' },
@@ -32,7 +33,6 @@ export function CaseWorkspacePage() {
   const [investigations, setInvestigations] = useState<Investigation[]>([])
   const [error, setError] = useState<string | null>(null)
   const [runningInvestigation, setRunningInvestigation] = useState(false)
-  const tabsRef = useRef<HTMLDivElement>(null)
 
   function loadAll() {
     if (!caseId) return
@@ -71,11 +71,6 @@ export function CaseWorkspacePage() {
     }
   }
 
-  function handleViewFindings() {
-    setActiveTab('findings')
-    tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   if (!kase) {
     return <div className="empty-state">Loading case…</div>
   }
@@ -83,104 +78,135 @@ export function CaseWorkspacePage() {
   const latestInvestigation = investigations[0] ?? null
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <Link to="/" className="muted" style={{ fontSize: 12.5 }}>
-            ← All cases
+    <div className="console-shell">
+      <aside className="console-rail">
+        <DottedGlowBackground className="rail-canvas" />
+        <div className="rail-content">
+          <Link to="/" className="rail-brand">
+            <span className="rail-brand-mark">क</span>
+            <div>
+              <div className="rail-brand-name">KARBHARI</div>
+              <div className="rail-brand-sub">Working Capital Guardian</div>
+            </div>
           </Link>
-          <h2 style={{ marginTop: 6 }}>
-            {kase.name} <span className="status-pill">{kase.status}</span>
-          </h2>
-          <p>{kase.business_name ?? 'No business name on file'}</p>
-        </div>
-        <button className="btn" onClick={handleRunInvestigation} disabled={runningInvestigation}>
-          {runningInvestigation ? 'Running…' : 'Run investigation'}
-        </button>
-      </div>
 
-      <WorkingCapitalHero investigation={latestInvestigation} onViewFindings={handleViewFindings} />
-
-      {error && <div className="error-banner">{error}</div>}
-
-      <div ref={tabsRef}>
-        <Tabs tabs={TABS} active={activeTab} onChange={setActiveTab} />
-      </div>
-
-      {activeTab === 'findings' && (
-        <div>
-          {!latestInvestigation?.details ? (
-            <div className="card">
-              <div className="empty-state">
-                No findings yet — attach evidence and run an investigation above.
-              </div>
+          <div className="rail-case">
+            <Link to="/" className="rail-back">
+              ← All cases
+            </Link>
+            <h2 className="rail-case-name">{kase.name}</h2>
+            <div className="rail-case-meta">
+              <span className="status-pill status-pill-dark">{kase.status}</span>
+              <span>{kase.business_name ?? 'No business name on file'}</span>
             </div>
-          ) : (
-            <FindingsList findings={latestInvestigation.details.findings} />
-          )}
-        </div>
-      )}
+          </div>
 
-      {activeTab === 'investigation' && (
-        <div>
-          {!latestInvestigation ? (
-            <div className="card">
-              <div className="empty-state">
-                No investigation has been run yet. Attach evidence, then run an investigation.
-              </div>
-            </div>
-          ) : (
-            <>
+          <WorkingCapitalHero investigation={latestInvestigation} onViewFindings={() => setActiveTab('findings')} />
+
+          <SidebarNav items={NAV_ITEMS} active={activeTab} onChange={setActiveTab} />
+
+          <button
+            className="btn rail-run-btn"
+            onClick={handleRunInvestigation}
+            disabled={runningInvestigation}
+          >
+            {runningInvestigation ? 'Running…' : 'Run investigation'}
+          </button>
+        </div>
+      </aside>
+
+      <main className="console-main">
+        {error && <div className="error-banner">{error}</div>}
+
+        {activeTab === 'findings' && (
+          <section>
+            <h3 className="section-heading">Findings</h3>
+            {!latestInvestigation?.details ? (
               <div className="card">
-                <p className="muted" style={{ fontSize: 12.5 }}>
-                  Status: {latestInvestigation.status} · considered{' '}
-                  {latestInvestigation.evidence_count_considered} evidence item(s) · started{' '}
-                  {new Date(latestInvestigation.started_at).toLocaleString()}
-                </p>
-                <p className="summary-text">{latestInvestigation.summary}</p>
+                <div className="empty-state">
+                  No findings yet — attach evidence and run an investigation from the panel on the
+                  left.
+                </div>
               </div>
-              {latestInvestigation.details?.reconciliation && (
-                <ReconciliationCard reconciliation={latestInvestigation.details.reconciliation} />
-              )}
-              {latestInvestigation.details && (
-                <DebtorReconciliationCard
-                  debtorReconciliation={latestInvestigation.details.debtor_reconciliation}
-                  consistency={latestInvestigation.details.consistency}
-                />
-              )}
-            </>
-          )}
-        </div>
-      )}
+            ) : (
+              <FindingsList findings={latestInvestigation.details.findings} />
+            )}
+          </section>
+        )}
 
-      {activeTab === 'evidence' && (
-        <div className="card">
-          <EvidenceUploader categories={categories} onUpload={handleUpload} />
-          <div style={{ marginTop: 16 }}>
-            <EvidenceList evidence={evidence} onDelete={handleDelete} />
-          </div>
-        </div>
-      )}
+        {activeTab === 'investigation' && (
+          <section>
+            <h3 className="section-heading">Investigation detail</h3>
+            {!latestInvestigation ? (
+              <div className="card">
+                <div className="empty-state">
+                  No investigation has been run yet. Attach evidence, then run an investigation.
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="card">
+                  <p className="muted" style={{ fontSize: 12.5 }}>
+                    Status: {latestInvestigation.status} · considered{' '}
+                    {latestInvestigation.evidence_count_considered} evidence item(s) · started{' '}
+                    {new Date(latestInvestigation.started_at).toLocaleString()}
+                  </p>
+                  <p className="summary-text">{latestInvestigation.summary}</p>
+                </div>
+                <div className="investigation-grid">
+                  {latestInvestigation.details?.reconciliation && (
+                    <ReconciliationCard reconciliation={latestInvestigation.details.reconciliation} />
+                  )}
+                  {latestInvestigation.details && (
+                    <DebtorReconciliationCard
+                      debtorReconciliation={latestInvestigation.details.debtor_reconciliation}
+                      consistency={latestInvestigation.details.consistency}
+                    />
+                  )}
+                </div>
+              </>
+            )}
+          </section>
+        )}
 
-      {activeTab === 'trace' && (
-        <div className="card">
-          {!latestInvestigation?.details ? (
-            <div className="empty-state">
-              No investigation trace yet — run an investigation from the Investigation tab first.
+        {activeTab === 'evidence' && (
+          <section>
+            <h3 className="section-heading">Evidence</h3>
+            <div className="card">
+              <EvidenceUploader categories={categories} onUpload={handleUpload} />
+              <div style={{ marginTop: 16 }}>
+                <EvidenceList evidence={evidence} onDelete={handleDelete} />
+              </div>
             </div>
-          ) : (
-            <ToolTrace trace={latestInvestigation.details.tool_trace} />
-          )}
-        </div>
-      )}
+          </section>
+        )}
 
-      {activeTab === 'actions' && (
-        <div className="card">
-          <div className="empty-state">
-            The evidence pack and recommended corrective actions ship in a later phase.
-          </div>
-        </div>
-      )}
+        {activeTab === 'trace' && (
+          <section>
+            <h3 className="section-heading">How it investigated</h3>
+            <div className="card">
+              {!latestInvestigation?.details ? (
+                <div className="empty-state">
+                  No investigation trace yet — run an investigation from the panel on the left.
+                </div>
+              ) : (
+                <ToolTrace trace={latestInvestigation.details.tool_trace} />
+              )}
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'actions' && (
+          <section>
+            <h3 className="section-heading">Actions</h3>
+            <div className="card">
+              <div className="empty-state">
+                The evidence pack and recommended corrective actions ship in a later phase.
+              </div>
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   )
 }

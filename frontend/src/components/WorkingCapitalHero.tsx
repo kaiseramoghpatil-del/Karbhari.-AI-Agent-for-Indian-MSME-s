@@ -1,4 +1,3 @@
-import { DottedGlowBackground } from './DottedGlowBackground'
 import type { Investigation } from '../types'
 
 function fmtLakh(n: number): string {
@@ -15,6 +14,12 @@ interface Props {
   onViewFindings: () => void
 }
 
+/**
+ * Content only -- the dark background and dotted-glow canvas now belong to
+ * the console rail that hosts this (CaseWorkspacePage), so the headline
+ * figure stays visible no matter which section is active, rather than
+ * scrolling away with one boxed card.
+ */
 export function WorkingCapitalHero({ investigation, onViewFindings }: Props) {
   const reconciliation = investigation?.details?.reconciliation ?? null
   const findingsCount = investigation?.details?.findings.length ?? 0
@@ -40,7 +45,7 @@ export function WorkingCapitalHero({ investigation, onViewFindings }: Props) {
   } else if (reconciliation.gap > 0) {
     headline = fmtLakh(reconciliation.gap)
     headlineTone = 'gold'
-    eyebrow = 'POTENTIAL WORKING-CAPITAL CAPACITY IDENTIFIED'
+    eyebrow = 'POTENTIAL CAPACITY IDENTIFIED'
     qualifier = reconciliation.assumptions_used.length > 0
       ? 'Appears supportable under the supplied facility terms — built on assumptions; see Investigation.'
       : 'Appears supportable under the supplied facility terms, within the existing sanctioned limit.'
@@ -52,29 +57,31 @@ export function WorkingCapitalHero({ investigation, onViewFindings }: Props) {
   }
 
   return (
-    <div className="hero">
-      <DottedGlowBackground className="hero-canvas" />
-      <div className="hero-content">
-        <div className="hero-eyebrow">{eyebrow}</div>
-        <div className={`hero-figure tabular-nums hero-figure-${headlineTone}`}>{headline}</div>
-        <p className="hero-qualifier">{qualifier}</p>
-        <div className="hero-meta">
-          {investigation && (
-            <>
-              <span>{investigation.evidence_count_considered} evidence item(s) considered</span>
-              <span className="hero-meta-dot">·</span>
-              <span>{findingsCount} finding(s)</span>
-              <span className="hero-meta-dot">·</span>
-              <span className="hero-status">{investigation.status.replace('_', ' ')}</span>
-            </>
-          )}
+    <div className="rail-hero">
+      <div className="rail-hero-eyebrow">{eyebrow}</div>
+      <div className={`rail-hero-figure tabular-nums rail-hero-figure-${headlineTone}`}>{headline}</div>
+      <p className="rail-hero-qualifier">{qualifier}</p>
+      {investigation && (
+        <div className="rail-hero-meta">
+          <div>
+            <span className="rail-hero-meta-value">{investigation.evidence_count_considered}</span>
+            <span className="rail-hero-meta-label">evidence</span>
+          </div>
+          <div>
+            <span className="rail-hero-meta-value">{findingsCount}</span>
+            <span className="rail-hero-meta-label">findings</span>
+          </div>
+          <div>
+            <span className="rail-hero-meta-value rail-hero-status">{investigation.status.replace('_', ' ')}</span>
+            <span className="rail-hero-meta-label">status</span>
+          </div>
         </div>
-        {investigation && findingsCount > 0 && (
-          <button className="hero-link" onClick={onViewFindings} type="button">
-            View supporting findings ↓
-          </button>
-        )}
-      </div>
+      )}
+      {investigation && findingsCount > 0 && (
+        <button className="rail-hero-link" onClick={onViewFindings} type="button">
+          View supporting findings →
+        </button>
+      )}
     </div>
   )
 }

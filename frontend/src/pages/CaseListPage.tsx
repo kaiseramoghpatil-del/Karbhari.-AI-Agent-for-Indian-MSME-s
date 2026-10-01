@@ -40,18 +40,28 @@ export function CaseListPage() {
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
+    <div className="lobby">
+      <header className="lobby-header">
+        <div className="lobby-brand">
+          <span className="brand-mark">क</span>
+          <div>
+            <h1>
+              KARBHARI <span className="hindi">कारभारी</span>
+            </h1>
+            <p>Working Capital Guardian</p>
+          </div>
+        </div>
+      </header>
+
+      <div className="lobby-body">
+        <div className="lobby-intro">
           <h2>Cases</h2>
           <p>Every working-capital investigation starts here.</p>
         </div>
-      </div>
 
-      {error && <div className="error-banner">{error}</div>}
+        {error && <div className="error-banner">{error}</div>}
 
-      <div className="card">
-        <form className="form-row" onSubmit={handleCreate}>
+        <form className="lobby-new-case" onSubmit={handleCreate}>
           <input
             placeholder="Case name (e.g. Q3 CC facility review)"
             value={name}
@@ -66,28 +76,30 @@ export function CaseListPage() {
             {creating ? 'Creating…' : 'New case'}
           </button>
         </form>
-      </div>
 
-      {loading ? (
-        <div className="empty-state">Loading cases…</div>
-      ) : cases.length === 0 ? (
-        <div className="empty-state">No cases yet. Create one above to begin.</div>
-      ) : (
-        <div className="case-list">
-          {cases.map((c) => (
-            <Link key={c.id} to={`/cases/${c.id}`} className="case-list-item">
-              <div className="case-name">
-                {c.name}
-                <span className="status-pill">{c.status}</span>
-              </div>
-              <div className="case-meta">
-                {c.business_name ? `${c.business_name} · ` : ''}
-                opened {new Date(c.created_at).toLocaleDateString()}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <div className="empty-state">Loading cases…</div>
+        ) : cases.length === 0 ? (
+          <div className="empty-state">No cases yet. Create one above to begin.</div>
+        ) : (
+          <div className="case-grid">
+            {cases.map((c) => (
+              <Link key={c.id} to={`/cases/${c.id}`} className="case-card">
+                <div className="case-card-top">
+                  <span className="case-card-name">{c.name}</span>
+                  <span className="status-pill">{c.status}</span>
+                </div>
+                <div className="case-card-business">
+                  {c.business_name ?? 'No business name on file'}
+                </div>
+                <div className="case-card-date">
+                  Opened {new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
