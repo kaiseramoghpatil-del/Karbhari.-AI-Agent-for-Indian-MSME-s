@@ -21,7 +21,10 @@ export function FindingsList({ findings }: { findings: Finding[] }) {
       {findings.map((f, i) => (
         <div key={i} className={`finding-card finding-${f.status}`}>
           <div className="finding-head">
-            <span className={`status-badge status-badge-${f.status}`}>{STATUS_LABEL[f.status]}</span>
+            <span className={`status-chip status-chip-${f.status}`}>
+              <span className="status-chip-dot" />
+              {STATUS_LABEL[f.status]}
+            </span>
             {f.amount_impact !== null && (
               <span className="finding-amount">{fmtMoney(f.amount_impact)}</span>
             )}
@@ -29,11 +32,11 @@ export function FindingsList({ findings }: { findings: Finding[] }) {
           <h4>{f.title}</h4>
           <p>{f.explanation}</p>
           {f.evidence_quotes.length > 0 && (
-            <details>
+            <details className="evidence-disclosure">
               <summary>Supporting evidence ({f.evidence_quotes.length})</summary>
               <ul className="quote-list">
                 {f.evidence_quotes.map((q, qi) => (
-                  <li key={qi}>&ldquo;{q}&rdquo;</li>
+                  <li key={qi}>{q}</li>
                 ))}
               </ul>
             </details>

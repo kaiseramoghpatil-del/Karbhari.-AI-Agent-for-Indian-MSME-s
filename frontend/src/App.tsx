@@ -10,7 +10,9 @@ function App() {
         <Link to="/" className="home-link">
           <span className="brand-mark">क</span>
           <div className="brand-text">
-            <h1>KARBHARI</h1>
+            <h1>
+              KARBHARI <span className="hindi">कारभारी</span>
+            </h1>
             <p>Working Capital Guardian</p>
           </div>
         </Link>

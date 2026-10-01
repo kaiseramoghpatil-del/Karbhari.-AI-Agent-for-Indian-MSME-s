@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { Tabs } from '../components/Tabs'
@@ -8,25 +8,31 @@ import { ReconciliationCard } from '../components/ReconciliationCard'
 import { DebtorReconciliationCard } from '../components/DebtorReconciliationCard'
 import { FindingsList } from '../components/FindingsList'
 import { ToolTrace } from '../components/ToolTrace'
+import { WorkingCapitalHero } from '../components/WorkingCapitalHero'
 import type { Case, Evidence, Investigation } from '../types'
 
+// Ordered to match the product's real visual hierarchy: the graded
+// discoveries first, the math/detail behind them second, the raw evidence
+// that feeds it third, how the investigation got there fourth, and
+// corrective actions last.
 const TABS = [
-  { key: 'evidence', label: 'Evidence' },
-  { key: 'investigation', label: 'Investigation' },
   { key: 'findings', label: 'Findings' },
+  { key: 'investigation', label: 'Investigation' },
+  { key: 'evidence', label: 'Evidence' },
   { key: 'trace', label: 'How it investigated' },
   { key: 'actions', label: 'Actions' },
 ]
 
 export function CaseWorkspacePage() {
   const { caseId } = useParams<{ caseId: string }>()
-  const [activeTab, setActiveTab] = useState('evidence')
+  const [activeTab, setActiveTab] = useState('findings')
   const [kase, setKase] = useState<Case | null>(null)
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [investigations, setInvestigations] = useState<Investigation[]>([])
   const [error, setError] = useState<string | null>(null)
   const [runningInvestigation, setRunningInvestigation] = useState(false)
+  const tabsRef = useRef<HTMLDivElement>(null)
 
   function loadAll() {
     if (!caseId) return
@@ -57,12 +63,17 @@ export function CaseWorkspacePage() {
     try {
       await api.runInvestigation(caseId)
       loadAll()
-      setActiveTab('investigation')
+      setActiveTab('findings')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Investigation failed to start')
     } finally {
       setRunningInvestigation(false)
     }
+  }
+
+  function handleViewFindings() {
+    setActiveTab('findings')
+    tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   if (!kase) {
@@ -88,16 +99,25 @@ export function CaseWorkspacePage() {
         </button>
       </div>
 
+      <WorkingCapitalHero investigation={latestInvestigation} onViewFindings={handleViewFindings} />
+
       {error && <div className="error-banner">{error}</div>}
 
-      <Tabs tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      <div ref={tabsRef}>
+        <Tabs tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      </div>
 
-      {activeTab === 'evidence' && (
-        <div className="card">
-          <EvidenceUploader categories={categories} onUpload={handleUpload} />
-          <div style={{ marginTop: 16 }}>
-            <EvidenceList evidence={evidence} onDelete={handleDelete} />
-          </div>
+      {activeTab === 'findings' && (
+        <div>
+          {!latestInvestigation?.details ? (
+            <div className="card">
+              <div className="empty-state">
+                No findings yet — attach evidence and run an investigation above.
+              </div>
+            </div>
+          ) : (
+            <FindingsList findings={latestInvestigation.details.findings} />
+          )}
         </div>
       )}
 
@@ -133,17 +153,12 @@ export function CaseWorkspacePage() {
         </div>
       )}
 
-      {activeTab === 'findings' && (
-        <div>
-          {!latestInvestigation?.details ? (
-            <div className="card">
-              <div className="empty-state">
-                No findings yet — run an investigation from the Investigation tab first.
-              </div>
-            </div>
-          ) : (
-            <FindingsList findings={latestInvestigation.details.findings} />
-          )}
+      {activeTab === 'evidence' && (
+        <div className="card">
+          <EvidenceUploader categories={categories} onUpload={handleUpload} />
+          <div style={{ marginTop: 16 }}>
+            <EvidenceList evidence={evidence} onDelete={handleDelete} />
+          </div>
         </div>
       )}
 

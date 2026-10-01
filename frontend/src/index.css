@@ -1,15 +1,48 @@
 :root {
-  --ink: #1b1f27;
+  /* Ink / neutrals -- warm paper, not cold SaaS gray */
+  --ink: #15181f;
   --ink-soft: #5b6472;
-  --bg: #f3f1ec;
+  --ink-faint: #949ba6;
+  --bg: #f2efe8;
   --panel: #ffffff;
-  --border: #e2ddd1;
-  --accent: #27456b;
-  --accent-soft: #e8edf3;
-  --warn: #8a3b12;
+  --panel-sunken: #faf8f2;
+  --border: #e1dbcb;
+  --border-strong: #cdc4ad;
+
+  /* Interactive accent -- deep ink-navy, deliberately desaturated.
+     Never used for money figures -- see --money below. */
+  --accent: #1f3a56;
+  --accent-soft: #e7edf3;
+
+  /* Reserved exclusively for monetary figures: the headline capacity
+     number, finding amounts, DP values. A single consistent "this is
+     money" color across the product, never reused for UI chrome. */
+  --money: #8a6a1f;
+  --money-soft: #f6eed9;
+
+  /* Status */
   --good: #2f7a4f;
-  --radius: 10px;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --good-soft: #e3f3e9;
+  --amber: #8a6d12;
+  --amber-soft: #fdf3df;
+  --bad: #8a1f1f;
+  --bad-soft: #fde8e8;
+
+  /* Hero panel (the one dark moment in the product) */
+  --hero-bg: #0f1c2b;
+  --hero-bg-raised: #152638;
+  --hero-ink: #eef1f5;
+  --hero-ink-soft: #9fb0c2;
+  --hero-border: #253b52;
+
+  --radius: 8px;
+  --radius-lg: 10px;
+
+  --font-ui: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-figure: Georgia, 'Times New Roman', serif;
+  --font-mono: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+
+  font-family: var(--font-ui);
 }
 
 * {
@@ -26,6 +59,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -41,4 +75,8 @@ input,
 select,
 textarea {
   font-family: inherit;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
