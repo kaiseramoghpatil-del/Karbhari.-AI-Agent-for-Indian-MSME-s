@@ -1,0 +1,9 @@
+backend/.venv
+backend/data/karbhari.db
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+**/__pycache__
+**/.pytest_cache
+frontend/node_modules
+frontend/dist
+.git
