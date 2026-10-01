@@ -1,4 +1,5 @@
 backend/.venv
+backend/.env
 backend/data/karbhari.db
 backend/data/uploads/*
 !backend/data/uploads/.gitkeep

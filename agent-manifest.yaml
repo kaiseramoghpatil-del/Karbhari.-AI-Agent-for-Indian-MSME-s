@@ -1,17 +1,7 @@
 # aiKart Agent Manifest -- "Try Me Now" sandbox (Method 1 submission).
 #
-# IMPORTANT: runtime.image below is a PLACEHOLDER. aiKart requires a
-# publicly pullable image reference (Docker Hub, GHCR, etc). Before actual
-# submission:
-#   1. docker build -t <your-registry>/<your-org>/karbhari:0.1.0 .
-#   2. docker push <your-registry>/<your-org>/karbhari:0.1.0
-#   3. Replace the image value below with that pushed reference.
-#
-# Phase 0 only has the web-application flow to show (case creation + the
-# honest "not yet implemented" investigation stub) -- there is nothing to
-# demo-worthy here yet. This manifest exists so the aiKart execution
-# contract is wired in from day one; it will keep working unchanged as
-# later phases make the underlying investigation real.
+# Image pushed and verified: docker.io/yieldnever/karbhari:0.3.0
+# (matches the P2-verified build documented in README.md).
 
 apiVersion: aikart.dev/v1
 kind: AgentManifest
@@ -23,7 +13,7 @@ metadata:
 
 runtime:
   type: docker
-  image: "docker.io/REPLACE_ME/karbhari:0.1.0"
+  image: "docker.io/yieldnever/karbhari:0.3.0"
   # Overrides the image's default CMD (which runs the full web app) so the
   # sandbox instead runs one-shot through the same service layer.
   command: ["python", "-m", "app.aikart.entrypoint"]
@@ -43,4 +33,5 @@ output:
   format: markdown
 
 security:
-  networkEgress: none
+  networkEgress: allowlist
+  egressAllowlist: ["generativelanguage.googleapis.com"]
