@@ -39,18 +39,70 @@ export interface ReconciliationResult {
   can_calculate: boolean
 }
 
-export interface EvidenceExtraction {
-  evidence_id: string
-  original_filename: string
-  category: string
-  facts: Record<string, unknown>
+export interface ToolCallRecord {
+  step: number
+  thought: string
+  tool: string
+  tool_input: Record<string, unknown>
+  tool_output: Record<string, unknown>
+  output_summary: string
+}
+
+export interface InvoiceReconciliation {
+  invoice_id: string
+  date: string
+  amount: number
+  paid: number
+  balance: number
+  status: 'paid' | 'partial' | 'unpaid' | 'overpaid'
+  age_days: number
+  eligible: boolean
+  ineligibility_reason: string | null
+}
+
+export interface DuplicateInvoice {
+  invoice_id: string
+  amount: number
+  occurrences: number
+  excluded_amount: number
+}
+
+export interface UnallocatedReceipt {
+  receipt_id: string
+  amount: number
+  reason: string
+}
+
+export interface DebtorReconciliation {
+  invoices: InvoiceReconciliation[]
+  total_outstanding: number
+  total_eligible_outstanding: number
+  duplicate_invoices: DuplicateInvoice[]
+  unallocated_receipts: UnallocatedReceipt[]
+  warnings: string[]
+}
+
+export interface VarianceFlag {
+  field: string
+  from_period: string
+  to_period: string
+  from_value: number
+  to_value: number
+  pct_change: number
+  message: string
+}
+
+export interface ConsistencyResult {
+  flags: VarianceFlag[]
 }
 
 export interface InvestigationDetails {
-  extractions: EvidenceExtraction[]
-  aggregated_facts: Record<string, unknown> | null
+  tool_trace: ToolCallRecord[]
+  debtor_reconciliation: DebtorReconciliation | null
+  consistency: ConsistencyResult | null
   reconciliation: ReconciliationResult | null
   findings: Finding[]
+  stopped_reason: string
 }
 
 export interface Investigation {

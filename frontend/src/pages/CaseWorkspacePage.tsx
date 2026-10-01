@@ -5,13 +5,16 @@ import { Tabs } from '../components/Tabs'
 import { EvidenceUploader } from '../components/EvidenceUploader'
 import { EvidenceList } from '../components/EvidenceList'
 import { ReconciliationCard } from '../components/ReconciliationCard'
+import { DebtorReconciliationCard } from '../components/DebtorReconciliationCard'
 import { FindingsList } from '../components/FindingsList'
+import { ToolTrace } from '../components/ToolTrace'
 import type { Case, Evidence, Investigation } from '../types'
 
 const TABS = [
   { key: 'evidence', label: 'Evidence' },
   { key: 'investigation', label: 'Investigation' },
   { key: 'findings', label: 'Findings' },
+  { key: 'trace', label: 'How it investigated' },
   { key: 'actions', label: 'Actions' },
 ]
 
@@ -119,6 +122,12 @@ export function CaseWorkspacePage() {
               {latestInvestigation.details?.reconciliation && (
                 <ReconciliationCard reconciliation={latestInvestigation.details.reconciliation} />
               )}
+              {latestInvestigation.details && (
+                <DebtorReconciliationCard
+                  debtorReconciliation={latestInvestigation.details.debtor_reconciliation}
+                  consistency={latestInvestigation.details.consistency}
+                />
+              )}
             </>
           )}
         </div>
@@ -134,6 +143,18 @@ export function CaseWorkspacePage() {
             </div>
           ) : (
             <FindingsList findings={latestInvestigation.details.findings} />
+          )}
+        </div>
+      )}
+
+      {activeTab === 'trace' && (
+        <div className="card">
+          {!latestInvestigation?.details ? (
+            <div className="empty-state">
+              No investigation trace yet — run an investigation from the Investigation tab first.
+            </div>
+          ) : (
+            <ToolTrace trace={latestInvestigation.details.tool_trace} />
           )}
         </div>
       )}

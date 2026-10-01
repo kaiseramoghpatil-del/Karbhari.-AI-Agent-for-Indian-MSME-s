@@ -1,140 +1,139 @@
 # KARBHARI — Working Capital Guardian
 
-**Phase 1: real investigation.** KARBHARI now takes a real evidence bundle
-(sanction letter, stock statement, debtor/creditor ledgers, bank statement —
-PDF, XLSX, CSV, or plain text) and produces an actual, evidence-backed
-investigation: it extracts facts from messy documents, deterministically
-reconciles Drawing Power against the sanction terms, and synthesizes graded
-findings (supported / unresolved / ineligible-contradicted) with citations
-back to source evidence. See **Phase 1 results** below for a real run.
+**P2: a real bounded investigation, not a fixed pipeline.** KARBHARI now runs
+an actual agent loop: it decides what evidence to read, independently
+reconstructs debtor eligibility from invoice/receipt-level records (not a
+ledger's own subtotal), checks period-over-period consistency, and only then
+computes Drawing Power — deterministically, never by LLM arithmetic. See
+**P2 verified results** below for a real run against a 7-document case.
 
 ## What's real vs. stubbed
 
 | Layer | Status |
 |---|---|
-| Case create/list/get, evidence upload/list/delete | Real (Phase 0) |
-| Document text extraction (PDF, XLSX, CSV, plain text) | Real |
-| LLM fact extraction from messy documents, with provenance quotes | Real (Gemini, provider-swappable) |
-| Deterministic Drawing Power reconciliation | Real — pure Python, no LLM arithmetic |
+| Case/evidence CRUD, document text extraction (PDF/XLSX/CSV/text) | Real (P0/P1) |
+| Bounded ReAct-style investigator loop (agent chooses tools, not a fixed script) | Real |
+| Deterministic debtor reconciliation (FIFO receipt allocation, per-debtor segregation, duplicate/unallocated detection, ageing/eligibility) | Real — pure Python, independently tested |
+| Deterministic period-over-period consistency checking | Real — pure Python |
+| Deterministic Drawing Power calculation, with eligible-debtor figure forcibly overridden by the real reconciliation (not the agent's own number) | Real |
 | Graded findings (supported/unresolved/ineligible-contradicted) with evidence citations | Real |
-| aiKart sandbox entrypoint | Real, calls the same service layer as the web app (text-only input, no evidence upload — see Known limitations) |
-| Docker image | Built and verified (Phase 0) |
-| Multi-document conflict resolution across contradictory evidence | Detected and recorded (`AggregatedFacts.conflicts`), not yet surfaced as its own finding type |
-| TReDS/banking API integration, autonomous actions, multi-agent orchestration | Not built — out of scope for Phase 1 |
+| Full tool-call trace (for demo narration / "how did it find that") | Real, surfaced in the UI |
+| aiKart sandbox entrypoint | Real, text-only input (no evidence upload — unchanged limitation from P0) |
+| Docker image | Built and verified against P1 code; **not rebuilt against P2** — rebuild before relying on it |
+| TReDS/banking APIs, autonomous actions, multi-agent orchestration, OCR | Not built — deliberately out of scope |
 
 ## Architecture
 
 ```
 karbhari/
-  backend/
-    app/
-      main.py                 FastAPI app; serves API + built frontend
-      config.py                env-driven paths (data dir, db)
-      db.py                     SQLite engine/session (SQLModel)
-      models/                   Case, Evidence, Investigation (SQLModel tables)
-      services/
-        case_service.py
-        evidence_service.py
-        investigation_service.py
-        document_extraction.py  PDF/XLSX/CSV/text -> plain text, never raises
-      llm/
-        base.py                 LLMClient interface -- agent code depends only on this
-        gemini_client.py         Gemini REST implementation (no SDK dependency)
-        factory.py               LLM_PROVIDER-driven; only "gemini" implemented today
-      agent/
-        schemas.py               ExtractedFacts, Finding, ReconciliationResult, etc.
-        prompts.py                extraction + findings-synthesis system prompts
-        guardian.py               WorkingCapitalGuardian -- the real pipeline (see below)
-      calculations/
-        drawing_power.py          deterministic DP formula -- the ONLY place that number is computed
-      routers/                    thin FastAPI route handlers calling services/
-      aikart/entrypoint.py        aiKart "Try Me Now" sandbox adapter -- calls services/, not a separate app
-    tests/                       pytest suite, including one live Gemini integration test
-    data/                        sqlite db + uploaded evidence files (gitignored)
-  frontend/                      Vite + React + TypeScript
-    src/pages/                    CaseListPage, CaseWorkspacePage (Evidence / Investigation / Findings / Actions tabs)
-    src/components/                ReconciliationCard, FindingsList, EvidenceUploader/List
-  Dockerfile                    multi-stage: builds frontend, copies into the backend image
-  agent-manifest.yaml           aiKart manifest (image reference is a placeholder)
+  backend/app/
+    reconciliation/
+      schemas.py              Invoice, Receipt, DebtorReconciliationResult, ConsistencyResult
+      debtor_reconciliation.py  FIFO allocation, per-debtor segregation, duplicate/unallocated detection
+      consistency.py            period-over-period variance flagging
+    calculations/
+      drawing_power.py          the DP formula -- the ONLY place that number is computed
+    llm/                        provider-agnostic LLMClient (Gemini REST today)
+    agent/
+      tools.py                  InvestigatorToolbox -- the tool catalog + executors
+      investigator.py           the bounded ReAct loop (max 20 steps)
+      guardian.py                public entry point; builds the deterministic headline
+                                 finding and a code-level consistency-coverage backstop
+      prompts.py                single investigator system prompt (checklist-style)
+    ...                         (routers/, models/, services/ unchanged from P0/P1)
 ```
 
-### The investigation pipeline
+### The investigation loop
 
 ```
-evidence files
-  -> document_extraction (deterministic: bytes -> plain text)
-  -> LLM Stage 1 "extraction" (one call, all documents): reads messy text,
-     returns structured facts per document, each with a verbatim quote
-  -> aggregation (deterministic): one value per field across documents,
-     preferring the expected document type, recording any conflicts
-  -> calculations/drawing_power.py (deterministic): computes Drawing Power
-     from the sanction terms and records, compares against what the bank
-     reports, produces the headline gap figure
-  -> headline finding (deterministic, built directly from the reconciliation
-     result -- the LLM never sees or touches this number)
-  -> LLM Stage 2 "findings synthesis" (one call): given the extracted facts
-     AND the deterministic reconciliation as ground truth, produces
-     additional graded findings (data-quality issues, ambiguities,
-     anything that undermines a favorable conclusion) with citations
+list_evidence
+  -> read_evidence (agent decides which documents, in what order)
+  -> reconcile_debtors   (deterministic -- agent supplies parsed invoice/receipt
+                           line items, the tool does FIFO allocation, ageing,
+                           duplicate/unallocated detection, PER DEBTOR)
+  -> check_consistency   (deterministic -- flags >20% period-over-period swings)
+  -> calculate_drawing_power (deterministic -- eligible_debtor_value is forcibly
+                               overridden by reconcile_debtors' output if one was
+                               run, regardless of what the agent passes in)
+  -> finish (agent-authored findings for everything EXCEPT the headline gap,
+             which guardian.py constructs directly from the DP tool's own output)
 ```
 
-**"The LLM reasons, code calculates"** is enforced structurally, not just by
-prompt instruction: the headline capacity-gap finding is constructed in
-Python directly from `ReconciliationResult` (`guardian.py::_headline_finding`)
-before the LLM is ever asked to produce findings. The LLM's Stage 2 call is
-told the number as a given fact and instructed never to recompute it; it can
-only add *additional* findings around it.
+Bounded at 20 tool calls. Every step is logged (thought, tool, input, output)
+into `Investigation.details.tool_trace` and rendered in the UI's "How it
+investigated" tab — this is the actual trace of what happened, not a
+reconstruction after the fact.
 
-**Why two LLM calls, not one per document:** sending all documents in one
-extraction call (rather than N calls) keeps this within free-tier rate
-limits and is simpler to orchestrate, while still giving the model full
-context across documents to catch things like stale/mismatched dates. A
-richer pipeline (e.g. per-document calls, or an agent that decides what
-evidence to request next) is a reasonable Phase 2 direction, not a Phase 1
-requirement.
+**"The LLM reasons, Python calculates" is enforced in code, not just prompted
+for:**
+- The headline Drawing Power gap finding is built by `guardian.py` directly
+  from `calculate_drawing_power`'s return value. The agent never computes or
+  restates this number.
+- `calculate_drawing_power`'s tool executor *overrides* whatever
+  `eligible_debtor_value` the agent supplies with the real reconciled figure
+  from `reconcile_debtors`, if one was run in this session — see
+  `tools.py::_calculate_drawing_power`. Tested directly
+  (`test_agent_tools.py`).
+- `reconcile_debtors` groups invoices/receipts by `debtor_name` internally
+  before any matching happens, so correctness does not depend on the agent
+  remembering to call it once per debtor — a real bug found during demo-case
+  construction (see below) is now a permanent regression test.
 
-**Provider-agnostic LLM layer:** `agent/` code only imports from `llm/base.py`.
-Today `llm/factory.py` only implements Gemini (REST, no SDK dependency), but
-adding another provider means writing one more class and a branch in the
-factory — nothing in `agent/` or `calculations/` changes. Configure via
-`LLM_PROVIDER` / `LLM_MODEL` in `.env`.
+## P2 verified results (real run, not illustrative)
 
-**Why SQLite / why a JSON details column:** unchanged from Phase 0 — zero
-setup, adequate for hackathon volume. `Investigation.details_json` holds the
-full structured pipeline output (extractions, aggregated facts, reconciliation,
-findings) as one JSON blob rather than new normalized tables, since the shape
-is still likely to change in Phase 2.
+A 7-document evidence bundle for "Suryoday Textiles Pvt Ltd" was built with
+genuine complexity, and the TRUE expected results were hand-computed
+independently *before* running the agent:
+- A real PDF sanction letter (₹80L limit, 25%/40% margins, 90-day debtor
+  eligibility, 3-month stock-statement staleness rule)
+- Two stock statement periods (Aug ₹42L → Sep ₹58L, a deliberate +38.1% swing)
+- 9 invoices across 5 debtors, including one duplicate ledger row
+- 4 receipts, including one tagged-partial, one untagged (FIFO-allocated),
+  and one that overpays and leaves an unallocated balance
+- A creditor ledger and a bank statement (reported DP ₹32L)
 
-## Phase 1 results (real run, not illustrative)
+**Hand-computed ground truth:** eligible debtor outstanding ₹16,00,000;
+calculated DP = ₹58L×0.75 + ₹16L×0.60 − ₹9L = **₹44,10,000**; gap vs. reported
+= **₹12,10,000**.
 
-A 5-document synthetic evidence bundle was built with a deliberate, hand-
-computed discrepancy and run through the actual pipeline end-to-end:
+**Actual agent run (live, Gemini, 11 tool calls):** matched every figure
+exactly — ₹16,00,000 eligible debtors, ₹44,10,000 calculated DP, ₹12,10,000
+gap. The agent independently: excluded the duplicate invoice (₹3,50,000),
+flagged the ₹70,000 unallocated receipt, excluded a 105-day-old invoice as
+ineligible, and caught the +38.1% stock swing via `check_consistency` —
+5 findings total, correctly split across supported/unresolved/
+ineligible-contradicted, not one-sided.
 
-- Sanction letter: ₹80,00,000 limit, 25% stock margin, 40% debtor margin, 90-day debtor eligibility
-- Stock statement (XLSX): ₹50,00,000, dated 15-May-2026
-- Debtor ledger (CSV): ₹40,00,000 total, ₹30,00,000 eligible (<90 days)
-- Creditor ledger (CSV): ₹8,00,000
-- Bank statement: reported Drawing Power ₹46,00,000
+### Real bugs found and fixed during this verification (not hypothetical)
 
-Expected calculation: `50,00,000×0.75 + 30,00,000×0.60 − 8,00,000 = 47,50,000`,
-against a reported ₹46,00,000 → gap of **₹1,50,000**.
-
-**Actual result:** extraction correctly pulled every figure with accurate
-quotes from all 5 documents (PDF path tested separately — see Known
-limitations); aggregation found zero conflicts and zero missing fields;
-the deterministic calculator produced **exactly** ₹47,50,000 / gap ₹1,50,000,
-matching the hand-computed expectation precisely. The LLM's findings-synthesis
-stage additionally flagged, entirely on its own, that the stock statement
-(May 2026) was dated ~4.5 months before the other records (September 2026) —
-correctly citing the sanction letter's own 3-month staleness rule and all 4
-relevant evidence IDs — something that would be easy for a reviewer to miss
-without a side-by-side date comparison.
-
-One real bug was found and fixed during this process: Gemini occasionally
-embeds literal unescaped newline/tab characters inside quoted JSON string
-values, which Python's strict JSON parser rejects. Fixed by parsing with
-`json.loads(..., strict=False)` and logging (rather than silently
-swallowing) any genuine parse failure.
+1. **Multi-debtor FIFO bleed.** `reconcile_debtors`, as first written, didn't
+   segregate by debtor — a parallel build of the demo case independently
+   discovered that pooling multiple debtors' records in one call let one
+   debtor's untagged receipt pay off a *different* debtor's older invoice.
+   Fixed by grouping internally by `debtor_name` before matching.
+   Regression-tested (`test_untagged_receipts_do_not_bleed_across_debtors`).
+2. **`finish_investigation` tool-call ambiguity.** Listing it in the same
+   numbered catalog as real tools made the model try to invoke it via
+   `action: call_tool` instead of the special `action: finish`. Fixed the
+   prompt *and* added a code-level fallback that treats the mistaken call as
+   a finish rather than wasting a step on an error.
+3. **Intermittent Gemini `MALFORMED_RESPONSE`** and a **corrupted-token JSON
+   prefix** (a stray non-ASCII character before an otherwise valid JSON
+   object) — both observed directly in logs, not theoretical. Both are now
+   retried (API errors and parse failures share one retry budget) before a
+   step is given up on.
+4. **Step budget too low.** 10 steps wasn't enough for a 7-document case
+   (list + 7 reads + 3 tool calls = 11 minimum). Raised to 20.
+5. **`check_consistency` is unreliably invoked by the agent.** Across 6 live
+   runs, 4 different prompt strategies (prose instruction, "MANDATORY"
+   framing, an explicit ordered checklist) and a model upgrade attempt, the
+   agent called `check_consistency` in only 1 of 6 runs despite it clearly
+   applying. This is a genuine, reproducible agent-autonomy limitation, not
+   fully solved. Mitigated — not fixed — with a code-level backstop
+   (`guardian.py::_consistency_coverage_gap`): if the agent never calls it
+   but the evidence has multiple same-category items, a `Finding` is added
+   stating plainly that the check wasn't run, rather than silently omitting
+   coverage. See **Known limitations**.
 
 ## Running locally
 
@@ -156,99 +155,59 @@ cd frontend
 npm install
 npm run dev
 ```
-Open the URL Vite prints (defaults to `http://127.0.0.1:5173`). The dev
-server proxies `/api/*` to `http://127.0.0.1:8000` (see `vite.config.ts`).
 
-> **Windows note:** Vite's default dev-server host can bind to the IPv6
-> loopback (`::1`) only, which makes `127.0.0.1` unreachable even though
-> the server reports "ready". `vite.config.ts` pins `server.host` to
-> `127.0.0.1` to avoid this.
+> **Windows dev-server note:** `uvicorn --reload` has not reliably picked up
+> every code change during iterative testing on this machine — if behavior
+> doesn't match what you expect after an edit, kill all python processes and
+> start a fresh instance rather than trusting `--reload`.
 
 **Tests:**
 ```bash
 cd backend
 .venv/Scripts/python -m pytest -q
 ```
-21 tests, including one live test against the real Gemini API
-(`test_guardian_live.py`) — it auto-skips if `GOOGLE_API_KEY` isn't set, so
-the rest of the suite stays runnable offline/in CI.
-
-## aiKart sandbox entrypoint (local test, no Docker needed)
-
-```bash
-cd backend
-AIKART_INPUT='{"message":"My bank says my credit line is fully used but I think there is unused capacity"}' python -m app.aikart.entrypoint
-```
-Outside the real sandbox there's no `/aikart/` directory to write to, so
-`main()` fails at the final file-write step with a clear `FileNotFoundError`
-— expected on a dev machine. Call the pure function directly to check the
-actual logic (this is what the test suite does):
-```python
-from app.aikart.entrypoint import run
-run({"message": "..."})
-```
+41 tests, including one live test against the real Gemini API
+(auto-skips without `GOOGLE_API_KEY`).
 
 ## Docker
 
-```bash
-docker build -t karbhari:0.1.0 .
-docker run -p 8000:8000 karbhari:0.1.0
-```
-Built and verified against Docker 29.8.1 in Phase 0; the Phase 1 code
-changes don't affect the container setup (same dependencies install path,
-same entrypoints). Re-verify with a fresh build before relying on it for
-submission, since this hasn't been rebuilt since the Phase 1 changes landed.
+Built and verified in P0/P1; **has not been rebuilt against the P2 agent
+loop / reconciliation modules**. Rebuild (`docker build -t karbhari:0.3.0 .`)
+and re-run the verification steps from the P1 README section before relying
+on it for submission.
 
-To exercise the aiKart sandbox path in the built image:
-```bash
-mkdir -p aikart_test
-echo '{"message":"My bank says my credit line is fully used"}' > aikart_test/input.json
+## Known limitations (stated honestly, not hidden)
 
-docker run --rm -v "$(pwd)/aikart_test:/aikart" \
-  --entrypoint python karbhari:0.1.0 -m app.aikart.entrypoint
+- **`check_consistency` is not reliably invoked by the agent** (see above).
+  The code-level backstop guarantees the *gap in coverage* is always visible
+  in the findings, but does not guarantee the check itself runs every time.
+  A model capable of more reliable instruction-following, or native
+  function-calling with enforced tool sequencing, would likely close this;
+  neither was adopted here to keep the integration surface and risk bounded
+  for a hackathon timeline.
+- **Creditor-side reconciliation stays simple** (a single total, no
+  invoice/payment-level AP reconciliation) — a deliberate scope cut, not an
+  oversight.
+- **Cross-document conflicts** (two documents disagreeing on the same figure)
+  are not explicitly tested in the P2 demo case — the aggregation-level
+  conflict detection from P1 was removed when the fixed extraction pipeline
+  was replaced by the agent loop; nothing currently re-implements it.
+- **Single demo case family verified.** Six live runs of one well-understood
+  7-document case, not a range of case shapes (10+ documents, contradictory
+  evidence, non-English text, genuinely illegible uploads).
+- The aiKart sandbox still cannot exercise evidence upload (unchanged from
+  P0/P1 — its input schema has no file type).
+- No authentication. Evidence categories are advisory, not enforced.
 
-cat aikart_test/output.json
-```
+## What's next
 
-## aiKart manifest
-
-`agent-manifest.yaml` is written against the aiKart Agent Manifest guide,
-but **`runtime.image` is a placeholder** (`docker.io/REPLACE_ME/karbhari:0.1.0`).
-Before actually submitting: build and push the image to a public registry,
-then replace the `image` field with that reference.
-
-## Known limitations of this phase (by design or by honest gap, not hidden)
-
-- **PDF extraction is unit-tested, not live-tested end-to-end.** The live
-  Phase 1 run used a sanction letter as plain text (realistic PDFs in
-  production are often scanned images needing OCR, which is out of scope).
-  `test_document_extraction.py` verifies the real pypdf code path against a
-  hand-built PDF with a genuine text layer, and separately verifies graceful
-  handling of a PDF with no text layer and of malformed files — but no run
-  has yet put a real-world PDF sanction letter through the full pipeline.
-- **The aiKart sandbox can't exercise evidence upload** — its input types
-  are text/textarea/number/boolean/select only, no file upload (unchanged
-  from Phase 0). The full document pipeline only runs through the web app.
-- **Cross-document conflicts are detected but not yet a finding.** If two
-  documents disagree on a figure, `AggregatedFacts.conflicts` records both
-  values, and the LLM's findings stage *can* see and act on this (it's part
-  of the payload it receives), but there's no guaranteed dedicated finding
-  for it yet — worth confirming behavior with a deliberately conflicting
-  test case in Phase 2.
-- **Single evidence bundle tested.** One rich, deliberately-constructed
-  scenario was verified end-to-end. Edge cases not yet tried: documents in
-  a language other than English, truly illegible/corrupted uploads, a case
-  with 10+ documents, or genuinely contradictory source documents.
-- No authentication — anyone who can reach the API can see every case.
-- Evidence categories are advisory, not enforced.
-
-## What Phase 2 might plug into
-
-- A `Finding` type/key for cross-document conflicts specifically, rather
-  than relying on the LLM to notice `AggregatedFacts.conflicts` unprompted.
-- Real-world PDF testing (scanned-image OCR is a bigger, separate decision).
-- The "Actions" tab — currently still a placeholder; the natural next step
-  once findings exist is turning the capacity-gap finding into a concrete
-  next action (e.g. a draft note to the bank requesting DP recomputation).
-- Persisting the investigation pipeline's shape as normalized tables instead
-  of one JSON blob, once the shape stabilizes.
+- Either accept the `check_consistency` coverage gap as a known constraint of
+  the current model tier, or invest in native function-calling / a stronger
+  model specifically to close it.
+- Rebuild and re-verify the Docker image against P2 before submission.
+- The "Actions" tab is still a placeholder — turning the capacity-gap finding
+  into a concrete next action (e.g. a draft note to the bank) is the natural
+  next increment once the investigation layer is trusted.
+- Re-test with a deliberately harder case (contradictory documents, more
+  debtors, a genuinely illegible upload) to find the next real failure mode
+  before a judge does.

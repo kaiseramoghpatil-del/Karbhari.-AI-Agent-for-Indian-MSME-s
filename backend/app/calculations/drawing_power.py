@@ -19,7 +19,36 @@ what it is and isn't sure about.
 
 from __future__ import annotations
 
-from ..agent.schemas import AggregatedFacts, ReconciliationResult
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+# NOTE: calculations/ is the foundational layer -- it defines its own I/O
+# types and must never import from agent/. agent/schemas.py re-exports
+# ReconciliationResult from here instead, keeping the dependency direction
+# the right way round (agent depends on calculations, not vice versa).
+
+
+class DrawingPowerInputs(BaseModel):
+    sanctioned_limit: float | None = None
+    stock_margin_pct: float | None = None
+    debtor_margin_pct: float | None = None
+    stock_value: float | None = None
+    eligible_debtor_value: float | None = None
+    total_debtor_value: float | None = None
+    creditor_value: float | None = None
+    reported_drawing_power: float | None = None
+    current_outstanding_or_utilization: float | None = None
+
+
+class ReconciliationResult(BaseModel):
+    calculated_dp: float | None = None
+    comparison_basis: Literal["reported_drawing_power", "current_outstanding", "none"] = "none"
+    comparison_value: float | None = None
+    gap: float | None = None
+    assumptions_used: list[str] = Field(default_factory=list)
+    missing_inputs: list[str] = Field(default_factory=list)
+    can_calculate: bool = False
 
 # Commonly-cited typical margins for stock/book-debt hypothecation in India
 # (see Phase 0 research). These are fallbacks, not facts -- using them is
@@ -33,7 +62,7 @@ DEFAULT_DEBTOR_MARGIN_PCT = 40.0
 MATERIALITY_THRESHOLD = 1000.0
 
 
-def reconcile_drawing_power(facts: AggregatedFacts) -> ReconciliationResult:
+def reconcile_drawing_power(facts: DrawingPowerInputs) -> ReconciliationResult:
     assumptions: list[str] = []
     missing: list[str] = []
 

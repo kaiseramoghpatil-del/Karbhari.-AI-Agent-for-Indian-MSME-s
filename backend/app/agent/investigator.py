@@ -1,0 +1,206 @@
+"""
+Bounded ReAct-style investigation loop.
+
+Each turn: the model sees a transcript of everything done so far and
+returns exactly one action -- call a tool, or finish. This replaces
+Phase 1's fixed two-call pipeline (extract-everything, then
+synthesize-findings) with an agent that actually decides what to look at
+and when it has enough, bounded by MAX_STEPS so cost/runtime stay
+predictable regardless of what the model decides to do.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import time
+
+from ..llm.base import LLMClient, LLMError
+from ..models.evidence import Evidence
+from .prompts import INVESTIGATOR_SYSTEM_PROMPT
+from .schemas import Finding, ToolCallRecord
+from .tools import InvestigatorToolbox
+
+logger = logging.getLogger(__name__)
+
+MAX_STEPS = 20
+# Gemini occasionally returns an empty/MALFORMED_RESPONSE candidate under
+# JSON-mode constraints for no evident reason tied to the prompt content --
+# observed directly during testing. A short bounded retry absorbs that
+# without masking a genuine, persistent failure (which still surfaces as
+# llm_error after retries are exhausted).
+LLM_CALL_RETRIES = 2
+LLM_RETRY_DELAY_SECONDS = 1.5
+VALID_TOOLS = {
+    "list_evidence",
+    "read_evidence",
+    "reconcile_debtors",
+    "check_consistency",
+    "calculate_drawing_power",
+}
+
+
+class InvestigationRun:
+    """Result of running the loop: the full trace plus whatever the agent
+    concluded, and the toolbox (so the caller can read back the last
+    deterministic reconciliation/consistency/DP results directly rather
+    than re-parsing them out of the trace)."""
+
+    def __init__(self, trace: list[ToolCallRecord], findings: list[Finding], stopped_reason: str, toolbox: InvestigatorToolbox):
+        self.trace = trace
+        self.findings = findings
+        self.stopped_reason = stopped_reason
+        self.toolbox = toolbox
+
+
+def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> InvestigationRun:
+    toolbox = InvestigatorToolbox(evidence)
+    trace: list[ToolCallRecord] = []
+    transcript_steps: list[dict] = []  # internal, carries full tool_output for prompt building
+
+    for step in range(1, MAX_STEPS + 1):
+        user_prompt = _build_transcript_prompt(transcript_steps)
+        action = None
+        last_exc: LLMError | None = None
+        last_raw: str | None = None
+        # A single retry budget covers both failure modes seen in practice:
+        # the API call itself erroring (LLMError), and the API call
+        # succeeding but returning text that isn't valid JSON even after
+        # lenient recovery. Both are transient per-call issues, not signs
+        # the investigation itself is broken -- worth one more try before
+        # giving up.
+        for attempt in range(1, LLM_CALL_RETRIES + 2):
+            try:
+                raw = llm.generate_json(INVESTIGATOR_SYSTEM_PROMPT, user_prompt, temperature=0.15)
+            except LLMError as exc:
+                last_exc = exc
+                logger.warning(
+                    "Investigator LLM call failed at step %s, attempt %s: %s", step, attempt, exc
+                )
+                if attempt <= LLM_CALL_RETRIES:
+                    time.sleep(LLM_RETRY_DELAY_SECONDS)
+                continue
+
+            last_raw = raw
+            action = _parse_action(raw)
+            if action is not None:
+                break
+            logger.warning(
+                "Could not parse investigator action at step %s, attempt %s: %r",
+                step, attempt, raw[:300],
+            )
+            if attempt <= LLM_CALL_RETRIES:
+                time.sleep(LLM_RETRY_DELAY_SECONDS)
+
+        if action is None and last_raw is None:
+            return InvestigationRun(trace, [], f"llm_error: {last_exc}", toolbox)
+        if action is None:
+            return InvestigationRun(trace, [], "unparseable_action", toolbox)
+
+        thought = str(action.get("thought", ""))
+
+        if action.get("action") == "finish":
+            findings = _parse_findings(action.get("findings") or [])
+            return InvestigationRun(trace, findings, "agent_finished", toolbox)
+
+        if action.get("action") == "call_tool":
+            tool = action.get("tool")
+            tool_input = action.get("tool_input") or {}
+
+            # Defensive: despite the prompt saying finish_investigation is not
+            # a callable tool, a model can still call it as one (observed
+            # during testing). Treat it as a finish rather than burning a
+            # step on an error -- the prompt instruction alone wasn't
+            # reliable enough, so the code doesn't depend on it being.
+            if tool == "finish_investigation":
+                findings = _parse_findings((tool_input or {}).get("findings") or [])
+                return InvestigationRun(trace, findings, "agent_finished", toolbox)
+
+            if tool not in VALID_TOOLS:
+                logger.warning("Investigator requested unknown tool %r at step %s", tool, step)
+                tool_output, summary = {"error": f"Unknown tool {tool!r}"}, "Unknown tool requested."
+            else:
+                tool_output, summary = toolbox.execute(tool, tool_input)
+
+            record = ToolCallRecord(
+                step=step,
+                thought=thought,
+                tool=str(tool),
+                tool_input=tool_input,
+                tool_output=tool_output,
+                output_summary=summary,
+            )
+            trace.append(record)
+            transcript_steps.append(
+                {"thought": thought, "tool": tool, "tool_input": tool_input, "tool_output": tool_output}
+            )
+            continue
+
+        logger.warning("Investigator returned neither call_tool nor finish at step %s: %r", step, action)
+        return InvestigationRun(trace, [], "invalid_action", toolbox)
+
+    logger.warning("Investigator hit the %s-step limit without finishing.", MAX_STEPS)
+    return InvestigationRun(trace, [], "step_limit_reached", toolbox)
+
+
+def _build_transcript_prompt(steps: list[dict]) -> str:
+    if not steps:
+        return "This is the start of the investigation. Call your first tool."
+
+    parts = ["Here is the investigation transcript so far:\n"]
+    for i, s in enumerate(steps, start=1):
+        parts.append(
+            f"--- Step {i} ---\n"
+            f"Your thought: {s['thought']}\n"
+            f"Tool called: {s['tool']}\n"
+            f"Tool input: {json.dumps(s['tool_input'])}\n"
+            f"Tool output: {json.dumps(s['tool_output'], default=str)}\n"
+        )
+    parts.append(
+        "\nDecide your next action: call another tool, or finish_investigation if you have "
+        "enough to conclude."
+    )
+    return "\n".join(parts)
+
+
+def _parse_action(raw: str) -> dict | None:
+    text = raw.strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.lower().startswith("json"):
+            text = text[4:]
+    try:
+        parsed = json.loads(text, strict=False)
+    except json.JSONDecodeError:
+        # Observed directly during testing: Gemini can prefix the response
+        # with a few corrupted/garbage characters before an otherwise valid
+        # JSON object (e.g. a stray non-ASCII token). Recover by slicing to
+        # the outermost braces rather than giving up outright -- this is a
+        # narrow, specific recovery (not a general "guess the JSON" parser),
+        # so it still fails honestly if the braces themselves are broken.
+        start, end = text.find("{"), text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            try:
+                parsed = json.loads(text[start : end + 1], strict=False)
+            except json.JSONDecodeError as exc:
+                logger.warning(
+                    "Failed to parse investigator JSON even after brace recovery (%s). "
+                    "First 500 chars: %r", exc, text[:500]
+                )
+                return None
+        else:
+            logger.warning("Failed to parse investigator JSON (no braces found). First 500 chars: %r", text[:500])
+            return None
+    if not isinstance(parsed, dict):
+        return None
+    return parsed
+
+
+def _parse_findings(raw_findings: list) -> list[Finding]:
+    findings = []
+    for item in raw_findings:
+        try:
+            findings.append(Finding.model_validate(item))
+        except Exception:  # noqa: BLE001
+            continue
+    return findings
