@@ -73,9 +73,10 @@ def run(payload: dict) -> dict:
         f"**Case created:** {case_name}\n\n"
         f"**Status:** {investigation_status}\n\n"
         f"{investigation_summary}\n\n"
-        "_This is the Phase 0 foundation of KARBHARI's Working Capital Guardian. "
-        "Evidence upload and real reconciliation/reasoning ship in a later phase; "
-        "this sandbox run proves the case -> investigation pipeline end to end._"
+        "_This aiKart sandbox run has no evidence attached because its input fields are "
+        "text-only -- no file upload. The full investigation (document extraction, "
+        "Drawing Power reconciliation, graded findings) runs when evidence is attached "
+        "through the web app; this run only proves the sandbox wiring itself._"
     )
     return {"format": "markdown", "response": response}
 

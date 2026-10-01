@@ -4,6 +4,8 @@ import { api } from '../api/client'
 import { Tabs } from '../components/Tabs'
 import { EvidenceUploader } from '../components/EvidenceUploader'
 import { EvidenceList } from '../components/EvidenceList'
+import { ReconciliationCard } from '../components/ReconciliationCard'
+import { FindingsList } from '../components/FindingsList'
 import type { Case, Evidence, Investigation } from '../types'
 
 const TABS = [
@@ -97,29 +99,42 @@ export function CaseWorkspacePage() {
       )}
 
       {activeTab === 'investigation' && (
-        <div className="card">
+        <div>
           {!latestInvestigation ? (
-            <div className="empty-state">
-              No investigation has been run yet. Attach evidence, then run an investigation.
+            <div className="card">
+              <div className="empty-state">
+                No investigation has been run yet. Attach evidence, then run an investigation.
+              </div>
             </div>
           ) : (
             <>
-              <p className="muted" style={{ fontSize: 12.5 }}>
-                Status: {latestInvestigation.status} · considered{' '}
-                {latestInvestigation.evidence_count_considered} evidence item(s) · started{' '}
-                {new Date(latestInvestigation.started_at).toLocaleString()}
-              </p>
-              <p className="summary-text">{latestInvestigation.summary}</p>
+              <div className="card">
+                <p className="muted" style={{ fontSize: 12.5 }}>
+                  Status: {latestInvestigation.status} · considered{' '}
+                  {latestInvestigation.evidence_count_considered} evidence item(s) · started{' '}
+                  {new Date(latestInvestigation.started_at).toLocaleString()}
+                </p>
+                <p className="summary-text">{latestInvestigation.summary}</p>
+              </div>
+              {latestInvestigation.details?.reconciliation && (
+                <ReconciliationCard reconciliation={latestInvestigation.details.reconciliation} />
+              )}
             </>
           )}
         </div>
       )}
 
       {activeTab === 'findings' && (
-        <div className="card">
-          <div className="empty-state">
-            Findings (evidence-supported vs. unresolved) ship in a later phase.
-          </div>
+        <div>
+          {!latestInvestigation?.details ? (
+            <div className="card">
+              <div className="empty-state">
+                No findings yet — run an investigation from the Investigation tab first.
+              </div>
+            </div>
+          ) : (
+            <FindingsList findings={latestInvestigation.details.findings} />
+          )}
         </div>
       )}
 

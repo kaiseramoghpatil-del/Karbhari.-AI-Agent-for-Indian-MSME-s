@@ -56,16 +56,17 @@ def test_evidence_rejects_unknown_case(client):
     assert resp.status_code == 404
 
 
-def test_investigate_is_honest_stub(client):
+def test_investigate_with_no_evidence_is_honest(client):
     case = client.post("/api/cases", json={"name": "Investigation Case"}).json()
     case_id = case["id"]
 
     resp = client.post(f"/api/cases/{case_id}/investigate")
     assert resp.status_code == 200
     investigation = resp.json()
-    assert investigation["status"] == "not_implemented"
+    assert investigation["status"] == "no_evidence"
     assert investigation["evidence_count_considered"] == 0
-    assert "not yet implemented" in investigation["summary"] or "No evidence" in investigation["summary"]
+    assert "No evidence" in investigation["summary"]
+    assert investigation["details"] is None
 
     resp = client.get(f"/api/cases/{case_id}/investigations")
     assert resp.status_code == 200

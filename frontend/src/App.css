@@ -245,3 +245,106 @@
 .muted {
   color: var(--ink-soft);
 }
+
+/* Reconciliation card */
+.dp-figures {
+  display: flex;
+  gap: 28px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.dp-value {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.dp-gap-positive {
+  color: var(--accent);
+}
+
+/* Findings */
+.findings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.finding-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.finding-card h4 {
+  margin: 6px 0 4px;
+  font-size: 14px;
+}
+
+.finding-card p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.finding-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.finding-amount {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.status-badge-supported {
+  background: #e3f3e9;
+  color: var(--good);
+}
+
+.status-badge-unresolved {
+  background: #fdf3df;
+  color: #8a6d12;
+}
+
+.status-badge-ineligible_contradicted {
+  background: #fde8e8;
+  color: #8a1f1f;
+}
+
+.finding-supported {
+  border-left-color: var(--good);
+}
+
+.finding-unresolved {
+  border-left-color: #c99a1f;
+}
+
+.finding-ineligible_contradicted {
+  border-left-color: #b03a3a;
+}
+
+.quote-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.quote-list li {
+  margin-bottom: 4px;
+}
