@@ -103,6 +103,21 @@ mindmap
       Reasoning trace
 ```
 
+## 📸 A look inside
+
+A console built like a financial-investigation film: precise numerals, a quiet dot grid, colour that always means something (gold for capacity, red for problems, green for verified), smooth transitions and subtle interface sound effects you can mute.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshot-lobby.jpg" alt="KARBHARI lobby"><br><sub><b>Lobby.</b> Open a case, see the verified benchmark.</sub></td>
+    <td width="50%"><img src="docs/screenshot-investigating.jpg" alt="Investigation in progress"><br><sub><b>Investigating.</b> The agent reads, cross-checks and verifies each document.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshot-investigation.jpg" alt="Investigation detail"><br><sub><b>Every figure.</b> Drawing Power, capacity bars and the debtor book.</sub></td>
+    <td width="50%"><img src="docs/screenshot-findings.jpg" alt="Findings"><br><sub><b>Findings.</b> Graded, cited and always backed by tested code.</sub></td>
+  </tr>
+</table>
+
 ## 🇮🇳 Bharat feasibility
 
 - **Works with what MSMEs already have.** Bank PDFs, Tally and Excel exports, CSVs. No new data entry, no bank integration.
@@ -120,6 +135,7 @@ mindmap
 | **Engines** | Pure Python: per-debtor FIFO reconciliation, ageing, duplicates, ±20% variance flags, Drawing Power with sanctioned margins and limit cap |
 | **Inputs** | Sanction letter, stock statements, debtor invoices and receipts, creditor ledger, bank statement (PDF, XLSX, CSV, TXT) |
 | **Outputs** | Capacity gap, graded findings with evidence quotes, invoice-level reconciliation, step-by-step trace |
+| **Console** | Film-style UI: count-up figures, transitions, live investigation overlay, synthesized sound effects (mutable) |
 | **Stack** | FastAPI · SQLModel/SQLite · React 19 + TypeScript + Vite · Docker |
 | **Quality** | 46 automated tests, including a live end-to-end run against Gemini |
 | **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.6.0` |
