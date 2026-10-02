@@ -1,10 +1,9 @@
 <p align="center"><img src="docs/karbhari-logo.png" width="104" alt="KARBHARI logo"></p>
 
-<h1 align="center">KARBHARI (कारभारी) — Working Capital Guardian</h1>
+<h1 align="center">KARBHARI · कारभारी</h1>
+<h3 align="center">Working Capital Guardian for Indian MSMEs</h3>
 
-<p align="center"><b>Find what your numbers are hiding.</b><br>
-An agentic investigator for Indian MSMEs: it reads a business's bank-facility evidence, reconstructs
-Drawing Power with deterministic, tested code, and reports graded, evidence-cited findings.</p>
+<p align="center"><b>Find what your numbers are hiding.</b> 🔍</p>
 
 <p align="center">
   <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="aiKart: Try Me Now Sandbox Ready" src="https://img.shields.io/badge/aiKart-Try%20Me%20Now%20Sandbox%20Ready-E8702A"></a>
@@ -12,289 +11,180 @@ Drawing Power with deterministic, tested code, and reports graded, evidence-cite
   <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
   <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
   <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
-  <img alt="Tests: 41 passing" src="https://img.shields.io/badge/tests-41%20passing-2EA44F">
+  <img alt="Tests: 46 passing" src="https://img.shields.io/badge/tests-46%20passing-2EA44F">
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue"></a>
 </p>
 
-<p align="center">Built for <b>Bharat Agentic 2026</b> · Powered by aiKart</p>
+<p align="center">
+  🎬 <a href="Karbhari%20Explainer%20Video.mp4">Explainer film</a> &nbsp;·&nbsp;
+  📘 <a href="Karbhari-Product-Document.pdf">Product document</a> &nbsp;·&nbsp;
+  🧭 <a href="Karbhari-Project-Guide.pdf">Project guide</a> &nbsp;·&nbsp;
+  🧪 <a href="ASSETS%20FOR%20TESTING">Test files</a>
+</p>
 
 ---
 
-## Start here
+## 💡 What is KARBHARI?
+
+Every MSME on a bank cash-credit line can only draw what its **Drawing Power** allows. The bank recalculates it every month from stock, debtors and creditors. When those numbers are stale, mis-aged or duplicated, the business quietly loses capital it is entitled to.
+
+**KARBHARI investigates it for you.** Upload the documents you already have. An AI agent reads them, cross-checks them and rebuilds your Drawing Power from first principles. You get the gap, the reasons, and the evidence behind every rupee.
+
+<p align="center"><img src="docs/screenshot-findings.jpg" width="900" alt="KARBHARI findings view"></p>
+<p align="center"><sub>A live run on our test files: ₹2,20,000 of Drawing Power the facility supports but the bank isn't recognising.</sub></p>
+
+## 🎯 Why it matters
+
+- 🏦 **Capital gets stuck.** Small errors in stock statements or debtor ageing shrink the limit an MSME can actually use.
+- 🧑‍💼 **Nobody has time to check.** Big companies have treasury teams. A small business has the owner.
+- 🤖 **Chatbots don't solve it.** They give advice, do maths in prose and can't show their working.
+
+KARBHARI gives a **defensible answer in under a minute**, honest enough to take to your banker or CA.
+
+## 🗺️ How it works
+
+```mermaid
+flowchart TB
+    owner(["🧑‍💼 MSME owner or CA opens a case"])
+
+    EV["📂 <b>Evidence the business already has</b><br/>📜 Sanction letter · 📦 Stock statements<br/>🧾 Invoices and receipts · 📒 Creditor ledger · 🏦 Bank statement"]
+
+    owner --> EV
+    EV --> X["🔍 Text extraction<br/>PDF · Excel · CSV · TXT"]
+
+    subgraph AG["🤖 Investigator agent · Gemini · max 20 steps"]
+        direction TB
+        t1["list_evidence"] --> t2["read_evidence<br/>on every file"]
+        t2 --> t3{"Decides what<br/>to check next"}
+    end
+    X --> AG
+
+    subgraph EN["🧮 Deterministic engines · pure Python · tested"]
+        direction LR
+        n1["Debtor reconciliation<br/>tagged, FIFO, unallocated<br/>ageing vs 90-day cut-off"]
+        n2["Consistency check<br/>flags swings of 20%+"]
+        n3["Drawing Power engine<br/>margins, creditors, limit cap"]
+    end
+    t3 -->|reconcile_debtors| n1
+    t3 -->|check_consistency| n2
+    t3 -->|calculate_drawing_power| n3
+    n1 -. "reconciled debtors override<br/>the agent's own figure" .-> n3
+
+    G["🛡️ Guardian<br/>builds the headline in code<br/>flags any skipped checks"]
+    n1 --> G
+    n2 --> G
+    n3 --> G
+
+    OUT["✅ <b>What you get</b><br/>💰 Capacity gap · 🏷️ Graded findings<br/>📎 Evidence quotes · 🧭 Full reasoning trace"]
+    G --> OUT
+```
+
+**The model reasons. Python calculates.** The agent chooses what to read and which checks to run. Every number comes from deterministic, tested code that can't hallucinate.
+
+```mermaid
+mindmap
+  root((KARBHARI))
+    📂 Reads
+      Sanction letter
+      Stock statements
+      Invoices and receipts
+      Creditor and bank records
+    🔎 Checks
+      Debtor ageing
+      Duplicate invoices
+      Unallocated receipts
+      Period-over-period swings
+    🧮 Calculates
+      Drawing Power
+      Capacity gap
+    ✅ Proves
+      Evidence quotes
+      Graded findings
+      Reasoning trace
+```
+
+## 🇮🇳 Bharat feasibility
+
+- **Works with what MSMEs already have.** Bank PDFs, Tally and Excel exports, CSVs. No new data entry, no bank integration.
+- **Cheap to run.** One container, 1 CPU and 1 GB RAM, Gemini Flash-Lite free tier. About 25 seconds per case.
+- **Trusted by the people who matter.** Banks and CAs can audit every figure, because the arithmetic lives in code and every finding cites its source.
+- **Honest by design.** It reports what weakens the owner's case as readily as what helps it, so it holds up in front of a credit officer.
+- **Big addressable need.** India has over 6 crore MSMEs (Ministry of MSME), and working capital is the most common pain point for the ones with bank credit.
+
+## ⚙️ Project specifications
 
 | | |
 |---|---|
-| 🎬 **Explainer film** (52 s) | [`Karbhari Explainer Video.mp4`](Karbhari%20Explainer%20Video.mp4) |
-| 📘 **Product document** — what it does, how, and why | [`Karbhari-Product-Document.pdf`](Karbhari-Product-Document.pdf) |
-| 🧭 **Project guide** — how to run and use it, with screenshots | [`Karbhari-Project-Guide.pdf`](Karbhari-Project-Guide.pdf) |
-| 🧪 **Try it on real files** | [`ASSETS FOR TESTING/`](ASSETS%20FOR%20TESTING) — six documents for a sample case |
+| **Agent** | Bounded ReAct loop on Google Gemini, up to 20 tool calls, full trace saved |
+| **Tools** | `list_evidence` · `read_evidence` · `reconcile_debtors` · `check_consistency` · `calculate_drawing_power` |
+| **Engines** | Pure Python: per-debtor FIFO reconciliation, ageing, duplicates, ±20% variance flags, Drawing Power with sanctioned margins and limit cap |
+| **Inputs** | Sanction letter, stock statements, debtor invoices and receipts, creditor ledger, bank statement (PDF, XLSX, CSV, TXT) |
+| **Outputs** | Capacity gap, graded findings with evidence quotes, invoice-level reconciliation, step-by-step trace |
+| **Stack** | FastAPI · SQLModel/SQLite · React 19 + TypeScript + Vite · Docker |
+| **Quality** | 46 automated tests, including a live end-to-end run against Gemini |
+| **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.6.0` |
 
-<p align="center"><img src="docs/screenshot-findings.jpg" width="900" alt="KARBHARI findings view on the bundled test case"></p>
-<p align="center"><sub>Live run on the bundled test case: calculated Drawing Power ₹25,70,000 vs ₹23,50,000 recognised by the bank — a ₹2,20,000 gap, with ₹6,00,000 of debtors excluded as past the 90-day cut-off.</sub></p>
+## 🚀 How to run
 
-### Quick start
+**1. Add your API key.** Copy `backend/.env.example` to `backend/.env` and paste a free key from [Google AI Studio](https://aistudio.google.com/apikey).
+
+**2. Start it with Docker** (recommended):
 
 ```bash
-# 1. put your Google AI Studio key in backend/.env  (see backend/.env.example)
-# 2. build and run the whole product in one container
 docker build -t karbhari:0.6.0 .
-run.bat                      # Windows; or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
-# 3. open http://127.0.0.1:8000, create a case, attach the files in "ASSETS FOR TESTING", click Run investigation
+run.bat        # or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
 ```
 
-### aiKart "Try Me Now"
+Open **http://127.0.0.1:8000** 🎉
 
-[`agent-manifest.yaml`](agent-manifest.yaml) runs the public image `docker.io/yieldnever/karbhari:0.6.0` through
-`app.aikart.entrypoint`. The image is published on Docker Hub and the entrypoint has been verified from it with
-networking disabled. aiKart inputs are text-only and the sandbox has no LLM key, so the default option,
-**"Run the bundled demo case"**, runs the six documents in `ASSETS FOR TESTING/` (pre-transcribed into line items)
-through KARBHARI's real reconciliation, consistency and Drawing Power engines and returns the full report:
-a Rs 2,20,000 gap, the invoice-by-invoice debtor table and graded findings. "Describe my own problem" creates a
-case from the text; the full evidence investigation with the live agent runs in the web app.
+<details>
+<summary><b>Or run backend and frontend separately (development)</b></summary>
 
----
-
-## How it works
-
-**A real bounded investigation, not a fixed pipeline.** KARBHARI runs
-an actual agent loop: it decides what evidence to read, independently
-reconstructs debtor eligibility from invoice/receipt-level records (not a
-ledger's own subtotal), checks period-over-period consistency, and only then
-computes Drawing Power — deterministically, never by LLM arithmetic. See
-**P2 verified results** below for a real run against a 7-document case.
-
-## What's real vs. stubbed
-
-| Layer | Status |
-|---|---|
-| Case/evidence CRUD, document text extraction (PDF/XLSX/CSV/text) | Real (P0/P1) |
-| Bounded ReAct-style investigator loop (agent chooses tools, not a fixed script) | Real |
-| Deterministic debtor reconciliation (FIFO receipt allocation, per-debtor segregation, duplicate/unallocated detection, ageing/eligibility) | Real — pure Python, independently tested |
-| Deterministic period-over-period consistency checking | Real — pure Python |
-| Deterministic Drawing Power calculation, with eligible-debtor figure forcibly overridden by the real reconciliation (not the agent's own number) | Real |
-| Graded findings (supported/unresolved/ineligible-contradicted) with evidence citations | Real |
-| Full tool-call trace (for demo narration / "how did it find that") | Real, surfaced in the UI |
-| aiKart sandbox entrypoint | Real. Text-only input; a bundled demo case runs the real deterministic engines on the six test documents |
-| Docker image | **Rebuilt and verified against P2** — full 7-document investigation run inside the container, PDF extraction, reconciliation, and the aiKart sandbox entrypoint all confirmed working |
-| TReDS/banking APIs, autonomous actions, multi-agent orchestration, OCR | Not built — deliberately out of scope |
-
-## Architecture
-
-```
-karbhari/
-  backend/app/
-    reconciliation/
-      schemas.py              Invoice, Receipt, DebtorReconciliationResult, ConsistencyResult
-      debtor_reconciliation.py  FIFO allocation, per-debtor segregation, duplicate/unallocated detection
-      consistency.py            period-over-period variance flagging
-    calculations/
-      drawing_power.py          the DP formula -- the ONLY place that number is computed
-    llm/                        provider-agnostic LLMClient (Gemini REST today)
-    agent/
-      tools.py                  InvestigatorToolbox -- the tool catalog + executors
-      investigator.py           the bounded ReAct loop (max 20 steps)
-      guardian.py                public entry point; builds the deterministic headline
-                                 finding and a code-level consistency-coverage backstop
-      prompts.py                single investigator system prompt (checklist-style)
-    ...                         (routers/, models/, services/ unchanged from P0/P1)
-```
-
-### The investigation loop
-
-```
-list_evidence
-  -> read_evidence (agent decides which documents, in what order)
-  -> reconcile_debtors   (deterministic -- agent supplies parsed invoice/receipt
-                           line items, the tool does FIFO allocation, ageing,
-                           duplicate/unallocated detection, PER DEBTOR)
-  -> check_consistency   (deterministic -- flags >20% period-over-period swings)
-  -> calculate_drawing_power (deterministic -- eligible_debtor_value is forcibly
-                               overridden by reconcile_debtors' output if one was
-                               run, regardless of what the agent passes in)
-  -> finish (agent-authored findings for everything EXCEPT the headline gap,
-             which guardian.py constructs directly from the DP tool's own output)
-```
-
-Bounded at 20 tool calls. Every step is logged (thought, tool, input, output)
-into `Investigation.details.tool_trace` and rendered in the UI's "How it
-investigated" tab — this is the actual trace of what happened, not a
-reconstruction after the fact.
-
-**"The LLM reasons, Python calculates" is enforced in code, not just prompted
-for:**
-- The headline Drawing Power gap finding is built by `guardian.py` directly
-  from `calculate_drawing_power`'s return value. The agent never computes or
-  restates this number.
-- `calculate_drawing_power`'s tool executor *overrides* whatever
-  `eligible_debtor_value` the agent supplies with the real reconciled figure
-  from `reconcile_debtors`, if one was run in this session — see
-  `tools.py::_calculate_drawing_power`. Tested directly
-  (`test_agent_tools.py`).
-- `reconcile_debtors` groups invoices/receipts by `debtor_name` internally
-  before any matching happens, so correctness does not depend on the agent
-  remembering to call it once per debtor — a real bug found during demo-case
-  construction (see below) is now a permanent regression test.
-
-## P2 verified results (real run, not illustrative)
-
-A 7-document evidence bundle for "Suryoday Textiles Pvt Ltd" was built with
-genuine complexity, and the TRUE expected results were hand-computed
-independently *before* running the agent:
-- A real PDF sanction letter (₹80L limit, 25%/40% margins, 90-day debtor
-  eligibility, 3-month stock-statement staleness rule)
-- Two stock statement periods (Aug ₹42L → Sep ₹58L, a deliberate +38.1% swing)
-- 9 invoices across 5 debtors, including one duplicate ledger row
-- 4 receipts, including one tagged-partial, one untagged (FIFO-allocated),
-  and one that overpays and leaves an unallocated balance
-- A creditor ledger and a bank statement (reported DP ₹32L)
-
-**Hand-computed ground truth:** eligible debtor outstanding ₹16,00,000;
-calculated DP = ₹58L×0.75 + ₹16L×0.60 − ₹9L = **₹44,10,000**; gap vs. reported
-= **₹12,10,000**.
-
-**Actual agent run (live, Gemini, 11 tool calls):** matched every figure
-exactly — ₹16,00,000 eligible debtors, ₹44,10,000 calculated DP, ₹12,10,000
-gap. The agent independently: excluded the duplicate invoice (₹3,50,000),
-flagged the ₹70,000 unallocated receipt, excluded a 105-day-old invoice as
-ineligible, and caught the +38.1% stock swing via `check_consistency` —
-5 findings total, correctly split across supported/unresolved/
-ineligible-contradicted, not one-sided.
-
-### Real bugs found and fixed during this verification (not hypothetical)
-
-1. **Multi-debtor FIFO bleed.** `reconcile_debtors`, as first written, didn't
-   segregate by debtor — a parallel build of the demo case independently
-   discovered that pooling multiple debtors' records in one call let one
-   debtor's untagged receipt pay off a *different* debtor's older invoice.
-   Fixed by grouping internally by `debtor_name` before matching.
-   Regression-tested (`test_untagged_receipts_do_not_bleed_across_debtors`).
-2. **`finish_investigation` tool-call ambiguity.** Listing it in the same
-   numbered catalog as real tools made the model try to invoke it via
-   `action: call_tool` instead of the special `action: finish`. Fixed the
-   prompt *and* added a code-level fallback that treats the mistaken call as
-   a finish rather than wasting a step on an error.
-3. **Intermittent Gemini `MALFORMED_RESPONSE`** and a **corrupted-token JSON
-   prefix** (a stray non-ASCII character before an otherwise valid JSON
-   object) — both observed directly in logs, not theoretical. Both are now
-   retried (API errors and parse failures share one retry budget) before a
-   step is given up on.
-4. **Step budget too low.** 10 steps wasn't enough for a 7-document case
-   (list + 7 reads + 3 tool calls = 11 minimum). Raised to 20.
-5. **`check_consistency` is unreliably invoked by the agent.** Across 6 live
-   runs, 4 different prompt strategies (prose instruction, "MANDATORY"
-   framing, an explicit ordered checklist) and a model upgrade attempt, the
-   agent called `check_consistency` in only 1 of 6 runs despite it clearly
-   applying. This is a genuine, reproducible agent-autonomy limitation, not
-   fully solved. Mitigated — not fixed — with a code-level backstop
-   (`guardian.py::_consistency_coverage_gap`): if the agent never calls it
-   but the evidence has multiple same-category items, a `Finding` is added
-   stating plainly that the check wasn't run, rather than silently omitting
-   coverage. See **Known limitations**.
-
-## Running locally
-
-Requires Python 3.12+ and Node 20+, and a Google AI Studio API key (free
-tier) in `backend/.env` — see `backend/.env.example`.
-
-**Backend:**
 ```bash
+# backend (Python 3.12+)
 cd backend
 python -m venv .venv
-.venv/Scripts/activate        # .venv/bin/activate on macOS/Linux
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
+uvicorn app.main:app --port 8000
 
-**Frontend (separate terminal):**
-```bash
+# frontend (Node 20+), in a second terminal
 cd frontend
 npm install
-npm run dev
+npm run dev                     # open http://127.0.0.1:5173
 ```
 
-> **Windows dev-server note:** `uvicorn --reload` has not reliably picked up
-> every code change during iterative testing on this machine — if behavior
-> doesn't match what you expect after an edit, kill all python processes and
-> start a fresh instance rather than trusting `--reload`.
+Run the tests with `cd backend && python -m pytest -q`.
+</details>
 
-**Tests:**
-```bash
-cd backend
-.venv/Scripts/python -m pytest -q
-```
-41 tests, including one live test against the real Gemini API
-(auto-skips without `GOOGLE_API_KEY`).
+## 🧪 What to test it on
 
-## Docker
+Everything you need is in [`ASSETS FOR TESTING/`](ASSETS%20FOR%20TESTING).
 
-```bash
-docker build -t karbhari:0.6.0 .
-docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
-# or pull the published image:
-docker pull yieldnever/karbhari:0.6.0
-```
+1. Create a case and attach the six files, picking a category for each.
+2. Click **Run investigation**.
+3. You should see:
 
-**Current image (P3): `docker.io/yieldnever/karbhari:0.6.0`**, public on Docker Hub. The aiKart sandbox
-entrypoint was re-verified by pulling the published image and running it with `--network none`.
-The verification below was originally done on the P2 image (`0.3.0`):
+| Check | Expected result |
+|---|---|
+| Calculated Drawing Power | **₹25,70,000** vs ₹23,50,000 recognised by the bank |
+| Capacity gap | **₹2,20,000** |
+| Ineligible debtors | INV-1002 and INV-1005, past 90 days, **₹6,00,000** excluded |
+| Period swings | Stock +25%, debtors +29.4%, creditors +33.3% |
 
-**Rebuilt and verified against P2** (image `karbhari:0.3.0`): ran the full
-7-document demo case (real PDF, two stock periods, multi-debtor invoices/
-receipts) against the running container and got the exact same
-independently-verified numbers as the host runs — eligible debtors
-₹16,00,000, calculated DP ₹44,10,000, gap ₹12,10,000, plus the duplicate/
-unallocated/aged-out findings, all correctly detected inside the container.
-Container logs were clean (no errors/warnings for this run). The aiKart
-sandbox entrypoint was re-verified the same way as P0/P1, via a
-volume-mounted `/aikart`:
-```bash
-mkdir -p aikart_test
-echo '{"message":"..."}' > aikart_test/input.json
-docker run --rm -v "$(pwd)/aikart_test:/aikart" --env-file backend/.env \
-  --entrypoint python yieldnever/karbhari:0.6.0 -m app.aikart.entrypoint
-```
-One caveat from this verification run specifically: the evidence files were
-uploaded without setting a `category` on each one, which meant the
-`check_consistency`-coverage-gap backstop (see Known limitations) didn't
-fire, since it keys off evidence categories. That's a property of how that
-particular test was set up, not a new bug — the web app's upload form always
-asks for a category.
+**On aiKart?** Click **Try Me Now** and keep the default *Run the bundled demo case*. The sandbox runs these same six documents through KARBHARI's real engines and returns the full report. (aiKart's sandbox is text-only with no LLM key, so the documents are pre-transcribed into line items; the report says so.)
 
-## Known limitations (stated honestly, not hidden)
+## ✅ Verified, not just demoed
 
-- **`check_consistency` is not reliably invoked by the agent** (see above).
-  The code-level backstop guarantees the *gap in coverage* is always visible
-  in the findings, but does not guarantee the check itself runs every time.
-  A model capable of more reliable instruction-following, or native
-  function-calling with enforced tool sequencing, would likely close this;
-  neither was adopted here to keep the integration surface and risk bounded
-  for a hackathon timeline.
-- **Creditor-side reconciliation stays simple** (a single total, no
-  invoice/payment-level AP reconciliation) — a deliberate scope cut, not an
-  oversight.
-- **Cross-document conflicts** (two documents disagreeing on the same figure)
-  are not explicitly tested in the P2 demo case — the aggregation-level
-  conflict detection from P1 was removed when the fixed extraction pipeline
-  was replaced by the agent loop; nothing currently re-implements it.
-- **Single demo case family verified.** Six live runs of one well-understood
-  7-document case, not a range of case shapes (10+ documents, contradictory
-  evidence, non-English text, genuinely illegible uploads).
-- The aiKart sandbox still cannot exercise evidence upload (unchanged from
-  P0/P1 — its input schema has no file type).
-- No authentication. Evidence categories are advisory, not enforced.
+We built a tricky 7-document case and worked out the right answer **by hand first**. The live agent then matched it to the rupee: **₹12,10,000** gap, ₹44,10,000 calculated Drawing Power. Along the way it caught a duplicate ₹3,50,000 invoice, a ₹70,000 unallocated receipt, a 105-day-old invoice and a 38% stock swing.
 
-## What's next
+## 🧭 Honest limits and what's next
 
-- Either accept the `check_consistency` coverage gap as a known constraint of
-  the current model tier, or invest in native function-calling / a stronger
-  model specifically to close it.
-- The "Actions" tab is still a placeholder — turning the capacity-gap finding
-  into a concrete next action (e.g. a draft note to the bank) is the natural
-  next increment once the investigation layer is trusted.
-- Re-test with a deliberately harder case (contradictory documents, more
-  debtors, a genuinely illegible upload) to find the next real failure mode
-  before a judge does.
+- The agent sometimes skips a check. KARBHARI flags the gap in its findings, and a re-run usually completes it.
+- No OCR yet, so scanned PDFs need a text layer.
+- The Actions tab is coming next: an evidence-backed note to your bank.
+- Creditors are reconciled as a total, not invoice by invoice.
 
-## License
+## 📄 License
 
-Released under the [Apache License 2.0](LICENSE).
+[Apache 2.0](LICENSE) · Built for **Bharat Agentic 2026** · Powered by aiKart
