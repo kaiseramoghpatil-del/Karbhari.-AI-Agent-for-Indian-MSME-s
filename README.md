@@ -11,7 +11,7 @@
   <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
   <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
   <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
-  <img alt="Tests: 56 passing" src="https://img.shields.io/badge/tests-56%20passing-2EA44F">
+  <img alt="Tests: 59 passing" src="https://img.shields.io/badge/tests-59%20passing-2EA44F">
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue"></a>
 </p>
 
@@ -137,7 +137,7 @@ A console built like a financial-investigation film: precise numerals, a quiet d
 | **Outputs** | Capacity gap, graded findings with evidence quotes, invoice-level reconciliation, step-by-step trace |
 | **Console** | Film-style UI: count-up figures, transitions, live investigation overlay, synthesized sound effects (mutable) |
 | **Stack** | FastAPI · SQLModel/SQLite · React 19 + TypeScript + Vite · Docker |
-| **Quality** | 56 automated tests, including a live end-to-end run against Gemini |
+| **Quality** | 59 automated tests, including a live end-to-end run against Gemini |
 | **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.7.0` |
 
 ## 🚀 How to run

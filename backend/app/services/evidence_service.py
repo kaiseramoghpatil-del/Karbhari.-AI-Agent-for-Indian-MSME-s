@@ -31,12 +31,20 @@ def _write_file(case_id: str, original_filename: str, content: bytes) -> tuple[s
     safe_name = Path(original_filename).name  # strip any path components
     dest = _case_dir(case_id) / f"{evidence_id}_{safe_name}"
     dest.write_bytes(content)
-    storage_path = str(dest.relative_to(UPLOAD_DIR))
+    # Always stored with "/" so a data directory written on Windows still
+    # resolves inside the Linux Docker image (and vice versa).
+    storage_path = dest.relative_to(UPLOAD_DIR).as_posix()
     return evidence_id, storage_path
 
 
+def resolve_storage_path(storage_path: str) -> Path:
+    """Absolute path for a stored evidence file. Accepts older records saved
+    with Windows "\\" separators as well as the current "/" form."""
+    return UPLOAD_DIR / storage_path.replace("\\", "/")
+
+
 def _delete_file(storage_path: str) -> None:
-    path = UPLOAD_DIR / storage_path
+    path = resolve_storage_path(storage_path)
     if path.exists():
         path.unlink()
 

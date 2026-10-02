@@ -24,7 +24,6 @@ from datetime import date
 from typing import Any
 
 from ..calculations.drawing_power import DrawingPowerInputs, ReconciliationResult, reconcile_drawing_power
-from ..config import UPLOAD_DIR
 from ..models.evidence import Evidence
 from ..reconciliation.consistency import check_consistency as _check_consistency
 from ..reconciliation.debtor_reconciliation import reconcile_debtors as _reconcile_debtors
@@ -36,6 +35,7 @@ from ..reconciliation.schemas import (
     Receipt,
 )
 from ..services.document_extraction import extract_text
+from ..services.evidence_service import resolve_storage_path
 
 TOOL_CATALOG = """
 TOOLS AVAILABLE
@@ -122,7 +122,7 @@ class InvestigatorToolbox:
     def _read_text(self, evidence_id: str) -> str:
         if evidence_id not in self._text_cache:
             e = self._evidence_by_id[evidence_id]
-            file_path = UPLOAD_DIR / e.storage_path
+            file_path = resolve_storage_path(e.storage_path)
             self._text_cache[evidence_id] = extract_text(file_path, e.content_type, e.original_filename)
         return self._text_cache[evidence_id]
 
