@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 
 from ..llm.base import LLMClient, LLMError
@@ -31,6 +32,12 @@ MAX_STEPS = 20
 # llm_error after retries are exhausted).
 LLM_CALL_RETRIES = 2
 LLM_RETRY_DELAY_SECONDS = 1.5
+# Gemini's free tier allows ~15 requests/minute and answers 429 with
+# "Please retry in Ns". Those waits are honoured (capped) and don't consume
+# LLM_CALL_RETRIES, so a busy minute slows a run down instead of failing it.
+RATE_LIMIT_RETRIES = 4
+RATE_LIMIT_MAX_WAIT_SECONDS = 45.0
+RATE_LIMIT_DEFAULT_WAIT_SECONDS = 20.0
 VALID_TOOLS = {
     "list_evidence",
     "read_evidence",
@@ -38,6 +45,18 @@ VALID_TOOLS = {
     "check_consistency",
     "calculate_drawing_power",
 }
+# Observed in live runs: the model sometimes finishes after reconciling debtors
+# but before ever calling calculate_drawing_power, leaving the headline empty.
+# The first premature finish is deferred with an explicit instruction; a second
+# one is accepted (guardian.py then reports the missing calculation honestly),
+# so the guard can never loop or invent a number.
+FINISH_DEFERRALS = 1
+FINISH_DEFERRED_NOTE = (
+    "You tried to finish, but calculate_drawing_power has not been called yet. Call "
+    "calculate_drawing_power now with the facility terms and figures you have read "
+    "(pass null for anything you could not find; the tool reports what is missing). "
+    "Then finish."
+)
 
 
 class InvestigationRun:
@@ -57,6 +76,24 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
     toolbox = InvestigatorToolbox(evidence)
     trace: list[ToolCallRecord] = []
     transcript_steps: list[dict] = []  # internal, carries full tool_output for prompt building
+    deferrals_left = FINISH_DEFERRALS
+
+    def defer_finish(step: int, thought: str) -> bool:
+        """True if this finish should be deferred (and records why, visibly)."""
+        nonlocal deferrals_left
+        if toolbox.last_dp_result is not None or deferrals_left <= 0 or step >= MAX_STEPS:
+            return False
+        deferrals_left -= 1
+        trace.append(
+            ToolCallRecord(
+                step=step,
+                thought=thought,
+                tool="finish_deferred",
+                output_summary="Finish deferred: calculate_drawing_power had not been run yet.",
+            )
+        )
+        transcript_steps.append({"thought": thought, "note": FINISH_DEFERRED_NOTE})
+        return True
 
     for step in range(1, MAX_STEPS + 1):
         user_prompt = _build_transcript_prompt(transcript_steps)
@@ -69,11 +106,23 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
         # lenient recovery. Both are transient per-call issues, not signs
         # the investigation itself is broken -- worth one more try before
         # giving up.
-        for attempt in range(1, LLM_CALL_RETRIES + 2):
+        attempt = 0
+        rate_limit_waits = 0
+        while attempt < LLM_CALL_RETRIES + 1:
+            attempt += 1
             try:
                 raw = llm.generate_json(INVESTIGATOR_SYSTEM_PROMPT, user_prompt, temperature=0.15)
             except LLMError as exc:
                 last_exc = exc
+                # Free-tier quota (429) asks the caller to wait ~15-20 s; honour
+                # that instead of burning the normal retry budget in 1.5 s steps.
+                wait = _rate_limit_wait(exc)
+                if wait is not None and rate_limit_waits < RATE_LIMIT_RETRIES:
+                    rate_limit_waits += 1
+                    attempt -= 1
+                    logger.warning("Rate limited at step %s; waiting %.0f s before retrying.", step, wait)
+                    time.sleep(wait)
+                    continue
                 logger.warning(
                     "Investigator LLM call failed at step %s, attempt %s: %s", step, attempt, exc
                 )
@@ -100,6 +149,8 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
         thought = str(action.get("thought", ""))
 
         if action.get("action") == "finish":
+            if defer_finish(step, thought):
+                continue
             findings = _parse_findings(action.get("findings") or [])
             return InvestigationRun(trace, findings, "agent_finished", toolbox)
 
@@ -113,6 +164,8 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
             # step on an error -- the prompt instruction alone wasn't
             # reliable enough, so the code doesn't depend on it being.
             if tool == "finish_investigation":
+                if defer_finish(step, thought):
+                    continue
                 findings = _parse_findings((tool_input or {}).get("findings") or [])
                 return InvestigationRun(trace, findings, "agent_finished", toolbox)
 
@@ -149,6 +202,9 @@ def _build_transcript_prompt(steps: list[dict]) -> str:
 
     parts = ["Here is the investigation transcript so far:\n"]
     for i, s in enumerate(steps, start=1):
+        if "note" in s:
+            parts.append(f"--- Step {i} ---\nYour thought: {s['thought']}\nSystem note: {s['note']}\n")
+            continue
         parts.append(
             f"--- Step {i} ---\n"
             f"Your thought: {s['thought']}\n"
@@ -161,6 +217,16 @@ def _build_transcript_prompt(steps: list[dict]) -> str:
         "enough to conclude."
     )
     return "\n".join(parts)
+
+
+def _rate_limit_wait(exc: LLMError) -> float | None:
+    """Seconds to wait if `exc` is a rate-limit (429) error, else None."""
+    text = str(exc)
+    if "429" not in text and "RESOURCE_EXHAUSTED" not in text:
+        return None
+    match = re.search(r"retry in ([\d.]+)\s*s", text)
+    wait = float(match.group(1)) + 1.0 if match else RATE_LIMIT_DEFAULT_WAIT_SECONDS
+    return min(wait, RATE_LIMIT_MAX_WAIT_SECONDS)
 
 
 def _parse_action(raw: str) -> dict | None:

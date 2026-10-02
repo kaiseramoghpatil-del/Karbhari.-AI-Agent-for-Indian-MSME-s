@@ -131,7 +131,7 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
     <div class="stat"><div class="v" style="color:var(--gold)">₹12.10L</div><div class="l">capacity gap found and matched to hand-computed ground truth, to the rupee</div></div>
     <div class="stat"><div class="v">11</div><div class="l">tool calls the agent chose, across a 7-document evidence bundle</div></div>
     <div class="stat"><div class="v">0</div><div class="l">headline figures computed by the language model; Python owns the arithmetic</div></div>
-    <div class="stat"><div class="v">49</div><div class="l">automated tests, including a live end-to-end run against the real model</div></div>
+    <div class="stat"><div class="v">56</div><div class="l">automated tests, including a live end-to-end run against the real model</div></div>
   </div>
 
   <div class="cols2" style="grid-template-columns:1fr 1.05fr;gap:10mm">
@@ -544,7 +544,7 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
     </div>
     <div class="feat"><div class="n">12</div><div class="bar" style="background:var(--violet)"></div>
       <h3>Packaged and tested</h3>
-      <p>A single Docker image serves the API and the built console. 49 automated tests cover extraction, reconciliation, consistency, Drawing Power, tools, the sandbox, the API and frontend serving, plus a live model run.</p>
+      <p>A single Docker image serves the API and the built console. 56 automated tests cover extraction, reconciliation, consistency, Drawing Power, tools, the agent loop, the sandbox, the API and frontend serving, plus a live model run.</p>
       <ul><li>The full 7-document case verified inside the container</li><li>Real bugs found in verification became permanent regression tests</li></ul>
       <div class="why"><b>WHY</b>For a financial tool, "it worked on my laptop once" is not evidence. Reproducibility is.</div>
     </div>
@@ -731,7 +731,7 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
       </table>
     </div>
     <div>
-      <h2 style="margin-top:0">Test coverage: 49 tests</h2>
+      <h2 style="margin-top:0">Test coverage: 56 tests</h2>
       <table>
         <thead><tr><th>Suite</th><th class="r">Tests</th></tr></thead>
         <tbody>
@@ -740,12 +740,13 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
           <tr><td>aiKart sandbox (incl. demo case)</td><td class="r num">7</td></tr>
           <tr><td>Drawing Power engine</td><td class="r num">6</td></tr>
           <tr><td>Consistency checks</td><td class="r num">5</td></tr>
+          <tr><td>Agent loop (finish guard, rate limits)</td><td class="r num">7</td></tr>
           <tr><td>Agent tools (incl. the override rule)</td><td class="r num">4</td></tr>
           <tr><td>Cases and evidence API</td><td class="r num">4</td></tr>
           <tr><td>Frontend serving (incl. path safety)</td><td class="r num">3</td></tr>
           <tr><td>Health</td><td class="r num">1</td></tr>
           <tr><td>Live end-to-end run on the real model*</td><td class="r num">1</td></tr>
-          <tr class="tot"><td>Total</td><td class="r num">49</td></tr>
+          <tr class="tot"><td>Total</td><td class="r num">56</td></tr>
         </tbody>
       </table>
       <p class="small" style="margin-top:2mm">* Skipped automatically when no API key is configured.</p>
@@ -773,7 +774,7 @@ cd backend &amp;&amp; python -m pytest -q</pre>
     <div>
       <h2 style="margin-top:0">Known limitations</h2>
       <ul class="clean" style="font-size:9.2pt">
-        <li><strong>The agent sometimes skips a check.</strong> It may skip <code>check_consistency</code> or finish before calculating. The code backstop makes the gap visible and a re-run usually completes it, but it is not forced.</li>
+        <li><strong>The agent can still skip a check.</strong> It may skip <code>check_consistency</code>; the code backstop makes that gap visible, but does not force the check. A premature finish before the Drawing Power calculation is sent back once.</li>
         <li><strong>Creditor-side reconciliation is simple:</strong> one total, not invoice- and payment-level.</li>
         <li><strong>Cross-document conflicts</strong> (two documents disagreeing on one figure) are not explicitly re-detected in the agent version.</li>
         <li><strong>One case family verified</strong> in depth; not yet tested on 10+ documents, contradictory evidence, non-English text or illegible uploads.</li>
