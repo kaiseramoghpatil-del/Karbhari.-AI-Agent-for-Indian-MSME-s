@@ -1,84 +1,72 @@
 import type { Investigation } from '../types'
-
-function fmtLakh(n: number): string {
-  const abs = Math.abs(n)
-  const sign = n < 0 ? '−' : ''
-  if (abs >= 1_00_00_000) return `${sign}₹${(abs / 1_00_00_000).toFixed(2)}Cr`
-  if (abs >= 1_00_000) return `${sign}₹${(abs / 1_00_000).toFixed(2)}L`
-  if (abs >= 1_000) return `${sign}₹${(abs / 1_000).toFixed(1)}K`
-  return `${sign}₹${abs.toFixed(0)}`
-}
+import { lakh } from '../lib/format'
+import { CountUp, Rings } from './fx'
 
 interface Props {
   investigation: Investigation | null
   onViewFindings: () => void
+  celebrate: number
 }
 
-/**
- * Content only -- the dark background and dotted-glow canvas now belong to
- * the console rail that hosts this (CaseWorkspacePage), so the headline
- * figure stays visible no matter which section is active, rather than
- * scrolling away with one boxed card.
- */
-export function WorkingCapitalHero({ investigation, onViewFindings }: Props) {
-  const reconciliation = investigation?.details?.reconciliation ?? null
+/** The headline figure in the console rail, styled like the film's ₹12.10 L reveal. */
+export function WorkingCapitalHero({ investigation, onViewFindings, celebrate }: Props) {
+  const r = investigation?.details?.reconciliation ?? null
   const findingsCount = investigation?.details?.findings.length ?? 0
 
-  let eyebrow = 'WORKING-CAPITAL POSITION'
-  let headline: string
-  let headlineTone: 'gold' | 'muted' = 'muted'
+  let eyebrow = 'Working-capital position'
+  let value: number | null = null
+  let tone: 'gold' | 'muted' | 'red' = 'muted'
   let qualifier: string
 
   if (!investigation) {
-    headline = '—'
-    qualifier = 'No investigation has been run on this case yet.'
+    qualifier = 'No investigation yet. Attach evidence and run one.'
   } else if (investigation.status === 'error') {
-    headline = '—'
-    qualifier = 'The last investigation run did not complete. See the Investigation tab.'
-  } else if (!reconciliation || !reconciliation.can_calculate) {
-    headline = '—'
-    qualifier = 'Drawing Power could not be independently calculated from the evidence supplied.'
-  } else if (reconciliation.gap === null) {
-    headline = fmtLakh(reconciliation.calculated_dp ?? 0)
-    headlineTone = 'muted'
-    qualifier = 'Calculated, but nothing in evidence to compare it against yet.'
-  } else if (reconciliation.gap > 0) {
-    headline = fmtLakh(reconciliation.gap)
-    headlineTone = 'gold'
-    eyebrow = 'POTENTIAL CAPACITY IDENTIFIED'
-    qualifier = reconciliation.assumptions_used.length > 0
-      ? 'Appears supportable under the supplied facility terms — built on assumptions; see Investigation.'
-      : 'Appears supportable under the supplied facility terms, within the existing sanctioned limit.'
+    tone = 'red'
+    qualifier = 'The last run did not complete. See the Investigation tab.'
+  } else if (!r || !r.can_calculate) {
+    qualifier = 'Drawing Power could not be calculated from the evidence supplied yet.'
+  } else if (r.gap === null) {
+    value = r.calculated_dp ?? 0
+    eyebrow = 'Calculated Drawing Power'
+    qualifier = 'Nothing in evidence to compare it against yet.'
+  } else if (r.gap > 0) {
+    value = r.gap
+    tone = 'gold'
+    eyebrow = 'Potential capacity identified'
+    qualifier = r.assumptions_used.length
+      ? 'Appears supportable under the facility terms. Built on assumptions; see Investigation.'
+      : 'Appears supportable under the facility terms, within the existing sanctioned limit.'
   } else {
-    headline = '₹0'
-    headlineTone = 'muted'
-    eyebrow = 'WORKING-CAPITAL POSITION'
-    qualifier = 'No evidence of unused capacity was found in this investigation.'
+    value = 0
+    qualifier = 'No evidence of unused capacity in this investigation.'
   }
 
   return (
-    <div className="rail-hero">
-      <div className="rail-hero-eyebrow">{eyebrow}</div>
-      <div className={`rail-hero-figure tabular-nums rail-hero-figure-${headlineTone}`}>{headline}</div>
-      <p className="rail-hero-qualifier">{qualifier}</p>
+    <div className={`hero-card hero-${tone}`}>
+      <Rings play={celebrate} />
+      <div className="label hero-eyebrow">{eyebrow}</div>
+      <div className={`hero-figure num ${tone === 'gold' ? 'gold glow-gold' : tone === 'red' ? 'red' : ''}`} key={celebrate}>
+        {value === null ? '—' : <CountUp value={value} format={(n) => lakh(n)} duration={1400} />}
+      </div>
+      <p className="hero-qual">{qualifier}</p>
       {investigation && (
-        <div className="rail-hero-meta">
+        <div className="hero-meta">
           <div>
-            <span className="rail-hero-meta-value">{investigation.evidence_count_considered}</span>
-            <span className="rail-hero-meta-label">evidence</span>
+            <span className="num">{investigation.evidence_count_considered}</span>
+            <span className="label">evidence</span>
           </div>
           <div>
-            <span className="rail-hero-meta-value">{findingsCount}</span>
-            <span className="rail-hero-meta-label">findings</span>
+            <span className="num">{findingsCount}</span>
+            <span className="label">findings</span>
           </div>
           <div>
-            <span className="rail-hero-meta-value rail-hero-status">{investigation.status.replace('_', ' ')}</span>
-            <span className="rail-hero-meta-label">status</span>
+            <span className={`num hero-status st-${investigation.status}`}>{investigation.status.replace('_', ' ')}</span>
+            <span className="label">status</span>
           </div>
         </div>
       )}
       {investigation && findingsCount > 0 && (
-        <button className="rail-hero-link" onClick={onViewFindings} type="button">
+        <button className="hero-link" onClick={onViewFindings} type="button">
           View supporting findings →
         </button>
       )}
