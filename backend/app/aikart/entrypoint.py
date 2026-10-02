@@ -31,6 +31,9 @@ load_dotenv()
 from ..db import get_session, init_db  # noqa: E402
 from ..models.case import CaseCreate  # noqa: E402
 from ..services import case_service, investigation_service  # noqa: E402
+from .demo_case import run_demo  # noqa: E402
+
+DEMO_MODE_PREFIX = "Run the bundled demo case"
 
 INPUT_PATH = "/aikart/input.json"
 OUTPUT_PATH = "/aikart/output.json"
@@ -46,11 +49,27 @@ def read_input() -> dict:
     raise RuntimeError("No input found at /aikart/input.json or AIKART_INPUT")
 
 
+def wants_demo(payload: dict) -> bool:
+    """Demo when the buyer picks it in the `mode` select, or leaves the description empty
+    while a mode was supplied. A bare `message` with no `mode` keeps the original behaviour."""
+    mode = str(payload.get("mode") or "")
+    if mode.startswith(DEMO_MODE_PREFIX):
+        return True
+    return bool(mode) and not (payload.get("message") or "").strip()
+
+
 def run(payload: dict) -> dict:
     """Pure function (no filesystem I/O) so this is directly unit-testable."""
+    if wants_demo(payload):
+        response = run_demo()["markdown"]
+        message = (payload.get("message") or "").strip()
+        if message:
+            response = f"> **Your note:** {message}\n\n" + response
+        return {"format": "markdown", "response": response}
+
     message = (payload.get("message") or "").strip()
     if not message:
-        raise ValueError("input.json must include a non-empty 'message' field")
+        raise ValueError("input.json must include a non-empty 'message' field (or choose the demo case)")
 
     init_db()
     session_gen = get_session()
@@ -76,7 +95,7 @@ def run(payload: dict) -> dict:
         "_This aiKart sandbox run has no evidence attached because its input fields are "
         "text-only -- no file upload. The full investigation (document extraction, "
         "Drawing Power reconciliation, graded findings) runs when evidence is attached "
-        "through the web app; this run only proves the sandbox wiring itself._"
+        "through the web app. To see a full investigation here, choose the bundled demo case._"
     )
     return {"format": "markdown", "response": response}
 

@@ -8,7 +8,7 @@ Drawing Power with deterministic, tested code, and reports graded, evidence-cite
 
 <p align="center">
   <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="aiKart: Try Me Now Sandbox Ready" src="https://img.shields.io/badge/aiKart-Try%20Me%20Now%20Sandbox%20Ready-E8702A"></a>
-  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.5.0-2496ED?logo=docker&logoColor=white"></a>
+  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.6.0-2496ED?logo=docker&logoColor=white"></a>
   <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
   <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
   <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
@@ -37,17 +37,20 @@ Drawing Power with deterministic, tested code, and reports graded, evidence-cite
 ```bash
 # 1. put your Google AI Studio key in backend/.env  (see backend/.env.example)
 # 2. build and run the whole product in one container
-docker build -t karbhari:0.5.0 .
-run.bat                      # Windows; or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.5.0
+docker build -t karbhari:0.6.0 .
+run.bat                      # Windows; or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
 # 3. open http://127.0.0.1:8000, create a case, attach the files in "ASSETS FOR TESTING", click Run investigation
 ```
 
 ### aiKart "Try Me Now"
 
-[`agent-manifest.yaml`](agent-manifest.yaml) runs the public image `docker.io/yieldnever/karbhari:0.5.0` through
+[`agent-manifest.yaml`](agent-manifest.yaml) runs the public image `docker.io/yieldnever/karbhari:0.6.0` through
 `app.aikart.entrypoint`. The image is published on Docker Hub and the entrypoint has been verified from it with
-networking disabled. aiKart inputs are text-only (no file upload), so the sandbox creates a case from the
-description; the full evidence investigation runs in the web app.
+networking disabled. aiKart inputs are text-only and the sandbox has no LLM key, so the default option,
+**"Run the bundled demo case"**, runs the six documents in `ASSETS FOR TESTING/` (pre-transcribed into line items)
+through KARBHARI's real reconciliation, consistency and Drawing Power engines and returns the full report:
+a Rs 2,20,000 gap, the invoice-by-invoice debtor table and graded findings. "Describe my own problem" creates a
+case from the text; the full evidence investigation with the live agent runs in the web app.
 
 ---
 
@@ -71,7 +74,7 @@ computes Drawing Power — deterministically, never by LLM arithmetic. See
 | Deterministic Drawing Power calculation, with eligible-debtor figure forcibly overridden by the real reconciliation (not the agent's own number) | Real |
 | Graded findings (supported/unresolved/ineligible-contradicted) with evidence citations | Real |
 | Full tool-call trace (for demo narration / "how did it find that") | Real, surfaced in the UI |
-| aiKart sandbox entrypoint | Real, text-only input (no evidence upload — unchanged limitation from P0) |
+| aiKart sandbox entrypoint | Real. Text-only input; a bundled demo case runs the real deterministic engines on the six test documents |
 | Docker image | **Rebuilt and verified against P2** — full 7-document investigation run inside the container, PDF extraction, reconciliation, and the aiKart sandbox entrypoint all confirmed working |
 | TReDS/banking APIs, autonomous actions, multi-agent orchestration, OCR | Not built — deliberately out of scope |
 
@@ -225,13 +228,13 @@ cd backend
 ## Docker
 
 ```bash
-docker build -t karbhari:0.5.0 .
-docker run -p 8000:8000 --env-file backend/.env karbhari:0.5.0
+docker build -t karbhari:0.6.0 .
+docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
 # or pull the published image:
-docker pull yieldnever/karbhari:0.5.0
+docker pull yieldnever/karbhari:0.6.0
 ```
 
-**Current image (P3): `docker.io/yieldnever/karbhari:0.5.0`**, public on Docker Hub. The aiKart sandbox
+**Current image (P3): `docker.io/yieldnever/karbhari:0.6.0`**, public on Docker Hub. The aiKart sandbox
 entrypoint was re-verified by pulling the published image and running it with `--network none`.
 The verification below was originally done on the P2 image (`0.3.0`):
 
@@ -248,7 +251,7 @@ volume-mounted `/aikart`:
 mkdir -p aikart_test
 echo '{"message":"..."}' > aikart_test/input.json
 docker run --rm -v "$(pwd)/aikart_test:/aikart" --env-file backend/.env \
-  --entrypoint python yieldnever/karbhari:0.5.0 -m app.aikart.entrypoint
+  --entrypoint python yieldnever/karbhari:0.6.0 -m app.aikart.entrypoint
 ```
 One caveat from this verification run specifically: the evidence files were
 uploaded without setting a `category` on each one, which meant the
