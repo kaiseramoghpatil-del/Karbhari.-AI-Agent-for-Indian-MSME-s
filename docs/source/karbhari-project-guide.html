@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KARBHARI · Project Guide</title>
+<style>
+@page { size: A4; margin: 0; }
+:root{ --ink:#0B0F14; --ink2:#1B232D; --paper:#FBFAF6; --line:#E4E0D6; --mut:#5E6873; --dim:#8D96A0;
+  --gold:#B8862A; --goldL:#F2C14E; --red:#C93C2E; --grn:#178A5D; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:10pt;line-height:1.55}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);break-after:page;padding:23mm 18mm 20mm}
+.page:last-child{break-after:auto}
+.num{font-family:Bahnschrift,"Segoe UI";font-weight:700}
+.hdr{position:absolute;top:10mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-family:Consolas,monospace;font-size:7.4pt;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:2.4mm}
+.hdr b{color:var(--ink);letter-spacing:.3em}
+.ftr{position:absolute;bottom:9mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.ftr .pg{color:var(--ink);font-weight:700}
+.sec-k{font-family:Consolas,monospace;font-weight:700;font-size:8.6pt;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:2.5mm}
+h1{font-weight:900;font-size:25pt;line-height:1.06;margin-bottom:3.5mm}
+h1 em{font-style:normal;color:var(--gold)}
+h2{font-weight:700;font-size:12.5pt;margin:5mm 0 2mm}
+h3{font-weight:700;font-size:10.5pt;margin-bottom:1mm}
+p{margin-bottom:2.4mm}
+.lede{font-size:11.5pt;line-height:1.5;color:var(--ink2);margin-bottom:5mm}
+.small{font-size:8.6pt;color:var(--mut)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+.card{background:#fff;border:1px solid var(--line);border-radius:3mm;padding:4mm 4.6mm}
+.tag{font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:1.5mm}
+table{width:100%;border-collapse:collapse;font-size:8.9pt}
+th{font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);text-align:left;border-bottom:1.6px solid var(--ink);padding:1.8mm 2.2mm}
+td{padding:1.7mm 2.2mm;border-bottom:1px solid var(--line);vertical-align:top}
+code{font-family:Consolas,monospace;font-size:8.4pt;background:#EFECE4;padding:.2mm 1.2mm;border-radius:1mm}
+pre{font-family:Consolas,monospace;font-size:8.2pt;line-height:1.55;background:var(--ink);color:#D5DCE4;border-radius:2.5mm;padding:3.6mm 4.4mm;white-space:pre-wrap}
+pre .c{color:#6B7682} pre .k{color:var(--goldL)}
+.chip{display:inline-block;font-family:Consolas,monospace;font-size:7pt;letter-spacing:.14em;font-weight:700;text-transform:uppercase;padding:.5mm 2mm;border-radius:10mm;border:1px solid}
+.chip.s{color:var(--grn);border-color:var(--grn);background:#E9F6F0}
+.chip.u{color:#9A6A0E;border-color:#D6A640;background:#FBF3E1}
+.chip.c{color:var(--red);border-color:var(--red);background:#FBEAE7}
+.shot{width:100%;border-radius:2.5mm;border:1px solid #D8D2C4;box-shadow:0 2mm 6mm rgba(11,15,20,.12);display:block}
+.cap{font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:2mm 0 0}
+.stepn{display:inline-flex;align-items:center;justify-content:center;width:8mm;height:8mm;border-radius:50%;background:var(--ink);color:var(--goldL);font-family:Bahnschrift;font-weight:700;font-size:10pt;margin-right:2.5mm;vertical-align:middle}
+ul.clean{list-style:none}
+ul.clean li{padding-left:5mm;position:relative;margin-bottom:1.4mm}
+ul.clean li:before{content:"";position:absolute;left:0;top:2.1mm;width:2mm;height:2mm;background:var(--gold);border-radius:.4mm}
+.callout{border-left:2.4px solid var(--gold);padding:1mm 0 1mm 4mm;margin:3mm 0;color:var(--ink2)}
+.callout.red{border-color:var(--red)}
+.page.dark{background:var(--ink);color:#E9EEF4}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.075) 1px,transparent 1.3px);background-size:6mm 6mm}
+.glow{position:absolute;border-radius:50%;filter:blur(30mm)}
+</style>
+<style>
+.shotwrap{position:relative}
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:6mm;align-items:start}
+.kbd{font-family:Consolas,monospace;font-size:8pt;border:1px solid var(--line);border-bottom-width:2px;border-radius:1.2mm;padding:.1mm 1.4mm;background:#fff}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page dark" style="padding:0">
+  <div class="dots"></div>
+  <div class="glow" style="width:150mm;height:150mm;background:rgba(242,193,78,.15);right:-40mm;top:130mm"></div>
+  <div style="position:absolute;inset:0;padding:20mm 18mm;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;font-family:Consolas;font-size:7.6pt;letter-spacing:.26em;color:#7D8893;text-transform:uppercase">
+      <span><b style="color:#fff;letter-spacing:.34em">KARBHARI</b>&nbsp;&nbsp;·&nbsp;&nbsp;Project guide</span><span>v0.7.0 · October 2026</span>
+    </div>
+    <div style="margin-top:62mm">
+      <div style="font-family:Consolas;font-weight:700;font-size:9pt;letter-spacing:.34em;color:var(--goldL);margin-bottom:5mm">HOW TO USE</div>
+      <div style="font-weight:900;font-size:62pt;line-height:.95;letter-spacing:.04em;color:#fff">KARBHARI</div>
+      <div style="font-size:18pt;color:#9AA4AF;margin-top:3mm;font-weight:300">Working Capital Guardian · project guide</div>
+      <div style="width:44mm;height:1.6mm;background:var(--goldL);margin:9mm 0"></div>
+      <div style="font-size:11.5pt;color:#A7B0BA;max-width:140mm;line-height:1.6">
+        Run it, give it a case, and read what it finds. Every screenshot in this guide was captured from a live
+        run of the real app on the test files that ship with the project.
+      </div>
+    </div>
+    <div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6mm;font-size:9pt;color:#C9D1DA">
+      <div><div class="num" style="font-size:20pt;color:var(--goldL)">1</div>Start the app</div>
+      <div><div class="num" style="font-size:20pt;color:var(--goldL)">2</div>Open a case and attach evidence</div>
+      <div><div class="num" style="font-size:20pt;color:var(--goldL)">3</div>Run the investigation</div>
+      <div><div class="num" style="font-size:20pt;color:var(--goldL)">4</div>Read, verify, act</div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 SETUP -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>1 · Start the app</span></div>
+  <div class="sec-k">Step 1 · Start the app</div>
+  <h1>Two ways to run it.<br><em>One API key.</em></h1>
+  <p class="lede">KARBHARI is one FastAPI backend serving a React console. Run it as a single Docker container, or run backend and frontend
+    separately while developing. Either way you need a Google AI Studio (Gemini) API key; the free tier is enough.</p>
+
+  <h2>Before you start: the API key</h2>
+  <p>Copy <code>backend/.env.example</code> to <code>backend/.env</code> and fill it in. Keep this file out of git.</p>
+<pre><span class="k">GOOGLE_API_KEY</span>=your-key-from-aistudio.google.com/apikey
+<span class="k">LLM_PROVIDER</span>=gemini
+<span class="k">LLM_MODEL</span>=gemini-flash-lite-latest   <span class="c"># an alias, tracks Google's current model</span></pre>
+
+  <div class="cols2" style="margin-top:5mm">
+    <div class="card">
+      <div class="tag">Option A · recommended</div>
+      <h3>Docker: the whole product in one container</h3>
+<pre style="margin-top:2mm"><span class="c"># build from the karbhari/ folder</span>
+docker build -t karbhari:0.7.0 .
+run.bat
+
+<span class="c"># or use the published image</span>
+docker run -p 8000:8000 \
+  --env-file backend/.env \
+  yieldnever/karbhari:0.7.0</pre>
+      <p class="small" style="margin-top:2mm"><code>run.bat</code> replaces any old <code>karbhari</code> container and starts the new one. Open
+        <strong>http://127.0.0.1:8000</strong>.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Option B · development</div>
+      <h3>Backend + frontend, two terminals</h3>
+<pre style="margin-top:2mm"><span class="c"># 1 · backend (Python 3.12+)</span>
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000
+
+<span class="c"># 2 · frontend (Node 20+)</span>
+cd frontend
+npm install
+npm run dev</pre>
+      <p class="small" style="margin-top:2mm">Open <strong>http://127.0.0.1:5173</strong>. Vite forwards <code>/api</code> to port 8000.</p>
+    </div>
+  </div>
+
+  <h2>Check it is alive</h2>
+<pre>curl http://127.0.0.1:8000/api/health
+<span class="c">→ {"status":"ok","service":"karbhari-backend"}</span></pre>
+  <div class="callout" style="font-size:9.2pt">Data lives in <code>backend/data/</code> (SQLite database and uploaded files). Set <code>KARBHARI_DATA_DIR</code>
+    to keep a separate workspace, for example a clean one for demos.</div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">02</span></div>
+</section>
+
+<!-- 2a CASE -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>2 · Open a case</span></div>
+  <div class="sec-k">Step 2 · Open a case</div>
+  <h1>One case per review.</h1>
+  <p class="lede">The lobby is where every investigation starts. Type a case name (for example <em>Q3 Drawing Power review</em>), add the
+    business name if you like, and click <strong>Open case</strong>. Your cases appear further down the page; click one to open its workspace.</p>
+  <img class="shot" src="guide-assets/v2_01_lobby.jpg">
+  <div class="cap">The lobby · open a case, see the verified benchmark and a sample of the agent at work</div>
+
+  <div class="cols2" style="margin-top:5mm;gap:6mm">
+    <div class="card">
+      <div class="tag">On this screen</div>
+      <ul class="clean" style="font-size:9pt">
+        <li><strong>Verified benchmark:</strong> the ₹12,10,000 gap KARBHARI matched to a hand-worked answer.</li>
+        <li><strong>Agent feed:</strong> an illustrative sample of the steps the agent takes (labelled <em>sample</em>).</li>
+        <li><strong>How it works</strong> and <strong>what it catches</strong>, further down.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">Sound and motion</div>
+      <p style="font-size:9pt;margin:0">The console uses subtle interface sounds: clicks, a whoosh between tabs, a chime when something is saved
+        and an impact when a result lands. Toggle them with <span class="kbd">SFX ON</span> in the top-right corner; your choice is remembered.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">03</span></div>
+</section>
+
+<!-- 2b EVIDENCE -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>2 · Attach evidence</span></div>
+  <div class="sec-k">Step 2 · Attach evidence</div>
+  <h1>Tag every file.</h1>
+  <p class="lede">In the case, open <strong>Evidence</strong>. Drop a file on the upload area (or click to browse), pick its category chip, then
+    click <strong>Attach evidence</strong>. Repeat for each document. PDF (with a text layer), XLSX, CSV and TXT all work.</p>
+  <img class="shot" src="guide-assets/v2_02_evidence.jpg">
+  <div class="cap">Evidence · the six test files from ASSETS FOR TESTING, each tagged, with the completeness checklist</div>
+
+  <table style="margin-top:4mm;font-size:8.6pt">
+    <thead><tr><th style="width:26%">Category</th><th>Upload</th><th style="width:34%">Gives KARBHARI</th></tr></thead>
+    <tbody>
+      <tr><td><strong>sanction letter</strong></td><td>The bank's sanction / facility letter</td><td>Limit, margins, debtor age cut-off</td></tr>
+      <tr><td><strong>stock statement</strong></td><td>Monthly stock statements (attach two months if you have them)</td><td>Stock value; period-over-period check</td></tr>
+      <tr><td><strong>debtor ledger</strong></td><td>Invoice-level ledger and receipts / payment records</td><td>Eligible debtors, rebuilt invoice by invoice</td></tr>
+      <tr><td><strong>creditor ledger</strong></td><td>Sundry creditors list</td><td>The creditor deduction</td></tr>
+      <tr><td><strong>bank statement</strong></td><td>CC account statement showing the DP the bank recognises</td><td>The figure to compare against</td></tr>
+    </tbody>
+  </table>
+  <div class="callout" style="font-size:9pt">The <strong>Case completeness</strong> checklist ticks off each category as you attach it, so you can see at a glance what is
+    still missing before you run.</div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">04</span></div>
+</section>
+
+<!-- 3 RUN -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>3 · Investigate</span></div>
+  <div class="sec-k">Step 3 · Run the investigation</div>
+  <h1>Click once.<br><em>Watch it work.</em></h1>
+  <p class="lede">Click <strong>Run investigation</strong> at the bottom of the left rail. A full-screen view shows the agent reading each of your
+    documents, cross-checking them and calculating Drawing Power. A run usually takes <strong>30 seconds to 2 minutes</strong>, depending on
+    the model's response time.</p>
+  <img class="shot" src="guide-assets/v2_03_overlay.jpg">
+  <div class="cap">Investigating · a gold beam ticks off each real document while the live log shows the current step</div>
+
+  <div class="cols2" style="margin-top:5mm;gap:6mm">
+    <div class="card">
+      <div class="tag">What happens behind the scenes</div>
+      <p style="font-size:9pt;margin:0"><code>list_evidence</code> → <code>read_evidence</code> on every file → <code>check_consistency</code> →
+        <code>reconcile_debtors</code> → <code>calculate_drawing_power</code> → findings. Bounded at 20 steps. Every number comes from tested
+        Python, never from the language model.</p>
+    </div>
+    <div class="card">
+      <div class="tag">When it finishes</div>
+      <p style="font-size:9pt;margin:0">The overlay lifts, the headline figure in the left rail counts up with gold rings, and you land on
+        <strong>Findings</strong>. If the model is slow, the overlay says so after 30 seconds; nothing is lost.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">05</span></div>
+</section>
+
+<!-- 4 FINDINGS -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>4 · Findings</span></div>
+  <div class="sec-k">Step 4 · Read the findings</div>
+  <h1>The headline,<br><em>then the reasons.</em></h1>
+  <img class="shot" src="guide-assets/v2_04_findings.jpg" style="margin-top:2mm">
+  <div class="cap">Findings · live result on the bundled test case</div>
+
+  <div class="cols2" style="margin-top:5mm;gap:6mm">
+    <div>
+      <h3>The left rail and top strip</h3>
+      <ul class="clean" style="font-size:9.2pt">
+        <li><strong>Potential capacity identified:</strong> the Drawing Power gap, here <strong>₹2.20 L</strong>
+          (calculated ₹25,70,000 vs ₹23,50,000 recognised by the bank).</li>
+        <li>The <strong>KPI strip</strong> repeats the key figures on every tab.</li>
+        <li><strong>Run again</strong> re-runs after you add or change files.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>How sure each finding is</h3>
+      <ul class="clean" style="font-size:9.2pt">
+        <li><span class="chip s">supported</span> evidence and a tool output directly back it.</li>
+        <li><span class="chip u">unresolved</span> incomplete or ambiguous, or an assumption was needed.</li>
+        <li><span class="chip c">contradicted</span> the evidence works against the claim.</li>
+        <li>Open <strong>Supporting evidence</strong> on any card for the exact quotes.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout" style="font-size:9pt;margin-top:4mm">The gap is headroom <strong>within the existing sanctioned limit</strong> that appears supportable under the
+    facility terms. It is not a request for more credit, and not a guarantee the bank will release it.</div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">06</span></div>
+</section>
+
+<!-- 5 INVESTIGATION TAB -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>5 · Check the numbers</span></div>
+  <div class="sec-k">Step 5 · Check the numbers</div>
+  <h1>Every figure, <em>shown in full.</em></h1>
+  <p class="lede" style="margin-bottom:4mm">Open <strong>Investigation</strong> to see the working behind the headline.</p>
+  <div class="two">
+    <div>
+      <img class="shot" src="guide-assets/v2_05_investigation.jpg">
+      <div class="cap">Investigation · reconciliation detail from the live run</div>
+    </div>
+    <div style="display:grid;gap:4mm">
+      <div class="card">
+        <div class="tag">Drawing Power reconciliation</div>
+        <p style="font-size:8.8pt;margin:0">Calculated DP, the bank's figure and the gap, drawn as two capacity bars with the headroom
+          percentage. Any assumption the engine had to make is listed; if inputs are missing, it names them.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Debtor reconciliation</div>
+        <p style="font-size:8.8pt;margin:0">The eligibility ring shows how much of the debtor book counts towards Drawing Power. Below it,
+          every invoice with balance, status, age and eligibility. In the test case, INV-1002 (152 days) and INV-1005 (107 days) are past
+          the 90-day cut-off, so <strong>₹6,00,000</strong> of ₹18,00,000 is excluded.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Period-over-period variance</div>
+        <p style="font-size:8.8pt;margin:0">Any figure that moved 20% or more between statements: here stock +25.0%, debtors +29.4% and
+          creditors +33.3% from June to September. Confirm what drove them before relying on the latest month.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">07</span></div>
+</section>
+
+<!-- 6 TRACE + ACTIONS -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>6 · Audit</span></div>
+  <div class="sec-k">Step 6 · Audit the reasoning</div>
+  <h1>See exactly <em>how it got there.</em></h1>
+  <p class="lede">Open <strong>How it investigated</strong> for the step-by-step timeline of the live run: the agent's reasoning, the tool it
+    called and a summary of the result. Expand <strong>Raw tool call</strong> to see the exact input and output.</p>
+  <img class="shot" src="guide-assets/v2_06_trace.jpg">
+  <div class="cap">How it investigated · the real trace, recorded as it ran</div>
+  <div class="cols2" style="margin-top:5mm;gap:6mm">
+    <div class="card">
+      <div class="tag">Reading the timeline</div>
+      <p style="font-size:9pt;margin:0">Each tool has its own colour, and the pills at the top count how often it ran: one
+        <code>list_evidence</code>, one <code>read_evidence</code> per file, then the checks and the calculation.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Actions tab</div>
+      <p style="font-size:9pt;margin:0">Previews what comes next: a draft note to your bank, an evidence pack PDF, a follow-up checklist and a
+        monthly watch. These are marked <em>next phase</em>; for now, take the findings and the Investigation tab to your banker or CA.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">08</span></div>
+</section>
+
+<!-- 7 TIPS -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Project guide</span><span>Tips</span></div>
+  <div class="sec-k">Tips and troubleshooting</div>
+  <h1>Getting a <em>complete answer.</em></h1>
+
+  <table>
+    <thead><tr><th style="width:36%">If you see…</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip u">unresolved</span> <strong>Drawing Power was not calculated</strong></td>
+        <td>The agent finished before running the calculation. It is non-deterministic, so click <strong>Run again</strong>; each run is kept in
+          the case history.</td></tr>
+      <tr><td><strong>…could not be independently calculated. Missing: …</strong></td><td>Upload the document named in the message: usually the sanction
+          letter, a current stock statement or a debtor ledger.</td></tr>
+      <tr><td><strong>…nothing to compare it against</strong></td><td>Add a bank / CC statement (or a document stating the DP the branch recognises).</td></tr>
+      <tr><td><strong>Placeholder margins / creditors treated as zero</strong></td><td>The sanction letter or creditor ledger wasn't found or readable. The result is an
+          estimate until you add them.</td></tr>
+      <tr><td><strong>Consistency was not checked in this run</strong></td><td>Two same-category statements exist but the agent skipped the comparison.
+          Re-run, or compare the periods yourself.</td></tr>
+      <tr><td><strong>"No extractable text found"</strong></td><td>The PDF is a scan. There is no OCR yet; upload a text PDF, Excel or CSV export instead.</td></tr>
+      <tr><td><strong>"Taking longer than usual"</strong></td><td>The model is slow right now. Leave the overlay open; the result appears when the run completes.</td></tr>
+      <tr><td><strong>Investigation could not start</strong></td><td>Check <code>GOOGLE_API_KEY</code> in <code>backend/.env</code> and restart.</td></tr>
+      <tr><td><strong>Port 8000 already in use</strong></td><td>Another KARBHARI (often the Docker container) is running. Stop it, or start uvicorn with
+          <code>--port 8010</code>.</td></tr>
+      <tr><td><strong>No sound</strong></td><td>Check <span class="kbd">SFX ON</span> in the top-right. Browsers only play audio after your first click on the page.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2" style="margin-top:6mm;gap:6mm">
+    <div class="card">
+      <div class="tag">For the best result, upload</div>
+      <ul class="clean" style="font-size:9pt">
+        <li>The sanction letter, with margins and the debtor age limit</li>
+        <li>Two consecutive stock statements</li>
+        <li>Invoice-level debtors <em>and</em> receipts, not just a subtotal</li>
+        <li>A creditor list and the bank's recognised DP</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">Try it now</div>
+      <p style="font-size:9pt;margin-bottom:1.5mm">The six files in <code>karbhari/ASSETS FOR TESTING/</code> reproduce the run in this guide:
+        a <strong>₹2.20 L</strong> gap and 3 supported findings.</p>
+      <p style="font-size:9pt;margin-bottom:1.5mm">On aiKart, <strong>Try Me Now</strong> runs the same case through KARBHARI's real engines.</p>
+      <p style="font-size:9pt;margin:0">Run the tests: <code>cd backend</code> then <code>python -m pytest -q</code>.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>KARBHARI · Project guide</span><span class="pg">09</span></div>
+</section>
+
+</body>
+</html>

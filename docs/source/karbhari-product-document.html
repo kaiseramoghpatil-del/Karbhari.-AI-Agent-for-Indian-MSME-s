@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KARBHARI · Working Capital Guardian · Product Document</title>
+<style>
+@page { size: A4; margin: 0; }
+:root{
+  --ink:#0B0F14; --ink2:#1B232D; --paper:#FBFAF6; --line:#E4E0D6; --mut:#5E6873; --dim:#8D96A0;
+  --gold:#B8862A; --goldL:#F2C14E; --red:#C93C2E; --grn:#178A5D;
+  --blue:#2F6FB5; --violet:#6F55C9; --teal:#1E9A94;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:10.2pt;line-height:1.55}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);break-after:page;padding:24mm 18mm 20mm}
+.page:last-child{break-after:auto}
+.num{font-family:Bahnschrift,"Segoe UI",sans-serif;font-weight:700;font-variant-numeric:tabular-nums}
+.hdr{position:absolute;top:10mm;left:18mm;right:18mm;display:flex;justify-content:space-between;align-items:center;font-family:Consolas,monospace;font-size:7.4pt;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:2.4mm}
+.hdr b{color:var(--ink);font-weight:700;letter-spacing:.3em}
+.ftr{position:absolute;bottom:9mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.ftr .pg{color:var(--ink);font-weight:700}
+.sec-k{font-family:Consolas,monospace;font-weight:700;font-size:8.6pt;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:2.5mm}
+h1{font-weight:900;font-size:27pt;line-height:1.06;letter-spacing:-.01em;margin-bottom:4mm}
+h1 em{font-style:normal;color:var(--gold)}
+h2{font-weight:700;font-size:13pt;margin:6mm 0 2.2mm}
+h3{font-weight:700;font-size:10.6pt;margin-bottom:1.2mm}
+p{margin-bottom:2.6mm}
+.lede{font-size:12pt;line-height:1.5;color:var(--ink2);margin-bottom:5mm;max-width:165mm}
+.small{font-size:8.6pt;color:var(--mut)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.card{background:#fff;border:1px solid var(--line);border-radius:3mm;padding:4.5mm 5mm}
+.card.dark{background:var(--ink);border-color:var(--ink);color:#E9EEF4}
+.tag{font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:1.5mm}
+.why{margin-top:1.8mm;padding-top:1.8mm;border-top:1px dashed var(--line);font-size:8.6pt;line-height:1.45;color:var(--ink2)}
+.why b{font-family:Consolas,monospace;font-size:7.4pt;letter-spacing:.18em;color:var(--gold);margin-right:1.5mm}
+.stat{border-top:2.4px solid var(--ink);padding-top:3mm}
+.stat .v{font-family:Bahnschrift;font-weight:700;font-size:24pt;line-height:1}
+.stat .l{font-size:8.6pt;color:var(--mut);margin-top:1.6mm;line-height:1.4}
+table{width:100%;border-collapse:collapse;font-size:8.9pt}
+th{font-family:Consolas,monospace;font-size:7.2pt;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);text-align:left;font-weight:700;border-bottom:1.6px solid var(--ink);padding:2mm 2.4mm}
+td{padding:2.1mm 2.4mm;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+tr.tot td{border-top:1.6px solid var(--ink);border-bottom:none;font-weight:700}
+table.tight td{padding:1.45mm 2.2mm;font-size:8.6pt} table.tight th{padding:1.6mm 2.2mm}
+.chip{display:inline-block;font-family:Consolas,monospace;font-size:7pt;letter-spacing:.14em;font-weight:700;text-transform:uppercase;padding:.6mm 2mm;border-radius:10mm;border:1px solid}
+.chip.s{color:var(--grn);border-color:var(--grn);background:#E9F6F0}
+.chip.u{color:#9A6A0E;border-color:#D6A640;background:#FBF3E1}
+.chip.c{color:var(--red);border-color:var(--red);background:#FBEAE7}
+pre{font-family:Consolas,monospace;font-size:7.9pt;line-height:1.5;background:var(--ink);color:#D5DCE4;border-radius:2.5mm;padding:4mm 4.5mm;white-space:pre-wrap}
+pre .k{color:var(--goldL)} pre .s{color:#8FD6B5} pre .c{color:#6B7682}
+code{font-family:Consolas,monospace;font-size:8.6pt;background:#EFECE4;padding:.2mm 1.2mm;border-radius:1mm}
+.formula{background:var(--ink);color:#fff;border-radius:3mm;padding:6mm 7mm;margin:4mm 0}
+.formula .f{font-family:Bahnschrift;font-size:15pt;font-weight:600;letter-spacing:.01em}
+.formula .f .g{color:var(--goldL)}
+.formula .cap{font-family:Consolas,monospace;font-size:7.6pt;letter-spacing:.2em;color:#8B96A3;text-transform:uppercase;margin-bottom:2.5mm}
+.steps{position:relative;margin-left:4mm}
+.steps:before{content:"";position:absolute;left:3.4mm;top:2mm;bottom:2mm;width:1.5px;background:var(--line)}
+.step{position:relative;padding-left:12mm;margin-bottom:4.2mm}
+.step .dot{position:absolute;left:0;top:.4mm;width:7mm;height:7mm;border-radius:50%;background:var(--ink);color:var(--goldL);font-family:Bahnschrift;font-weight:700;font-size:9pt;display:flex;align-items:center;justify-content:center}
+.step .tool{font-family:Consolas,monospace;font-size:8.4pt;color:var(--gold);font-weight:700}
+.page.dark{background:var(--ink);color:#E9EEF4}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.075) 1px,transparent 1.3px);background-size:6mm 6mm}
+.glow{position:absolute;border-radius:50%;filter:blur(30mm)}
+.feat{background:#fff;border:1px solid var(--line);border-radius:3mm;padding:3.8mm 4.6mm 3.4mm;position:relative}
+.feat .n{position:absolute;top:4mm;right:5mm;font-family:Bahnschrift;font-weight:700;font-size:15pt;color:#E7E2D6}
+.feat h3{font-size:11pt;margin-bottom:1.6mm;padding-right:10mm}
+.feat ul{margin:1mm 0 0 4.2mm;font-size:8.5pt;line-height:1.45}
+.feat li{margin-bottom:.8mm}
+.feat p{font-size:8.8pt;margin-bottom:1mm;line-height:1.48}
+.bar{height:1.2mm;width:12mm;border-radius:1mm;margin-bottom:2.4mm}
+.toc .row{display:grid;grid-template-columns:12mm 1fr auto;align-items:baseline;padding:2.6mm 0;border-bottom:1px solid var(--line)}
+.toc .row .i{font-family:Bahnschrift;font-weight:700;color:var(--gold);font-size:11pt}
+.toc .row .t{font-weight:600;font-size:11pt}
+.toc .row .p{font-family:Consolas,monospace;font-size:8.6pt;color:var(--dim)}
+.callout{border-left:2.4px solid var(--gold);padding:1mm 0 1mm 4.5mm;margin:4mm 0;font-size:10.6pt;color:var(--ink2)}
+.callout.red{border-color:var(--red)}
+ul.clean{list-style:none}
+ul.clean li{padding-left:5mm;position:relative;margin-bottom:1.6mm}
+ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;height:2mm;background:var(--gold);border-radius:.4mm}
+.shot{width:100%;border-radius:2.5mm;border:1px solid #D8D2C4;box-shadow:0 2mm 6mm rgba(11,15,20,.12);display:block}
+.capt{font-family:Consolas,monospace;font-size:7pt;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:1.6mm}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page dark" style="padding:0">
+  <div class="dots"></div>
+  <div class="glow" style="width:150mm;height:150mm;background:rgba(242,193,78,.16);right:-40mm;top:120mm"></div>
+  <div class="glow" style="width:120mm;height:120mm;background:rgba(255,77,61,.08);left:-50mm;top:-30mm"></div>
+  <div style="position:absolute;inset:0;padding:20mm 18mm;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;font-family:Consolas;font-size:7.6pt;letter-spacing:.26em;color:#7D8893;text-transform:uppercase">
+      <span><b style="color:#fff;letter-spacing:.34em">KARBHARI</b>&nbsp;&nbsp;·&nbsp;&nbsp;Product document</span><span>v0.7.0 · October 2026</span>
+    </div>
+    <div style="margin-top:58mm">
+      <div style="font-family:Consolas;font-weight:700;font-size:9pt;letter-spacing:.34em;color:var(--goldL);margin-bottom:5mm">WORKING CAPITAL GUARDIAN</div>
+      <div style="font-weight:900;font-size:66pt;line-height:.95;letter-spacing:.04em;color:#fff">KARBHARI</div>
+      <div style="font-size:20pt;color:#9AA4AF;margin-top:2mm;font-weight:300">कारभारी &nbsp;·&nbsp; the one who runs the enterprise</div>
+      <div style="width:44mm;height:1.6mm;background:var(--goldL);margin:9mm 0 9mm"></div>
+      <div style="font-size:21pt;font-weight:600;color:#fff;max-width:150mm;line-height:1.25">Find what your numbers are hiding.</div>
+      <div style="font-size:11.5pt;color:#A7B0BA;max-width:140mm;margin-top:5mm;line-height:1.55">
+        An agentic investigator for Indian MSMEs. It reads a business's bank-facility evidence, reconstructs its
+        working-capital position from first principles, and shows, with citations, where Drawing Power is being
+        lost and where it isn't.
+      </div>
+    </div>
+    <div style="margin-top:auto;display:grid;grid-template-columns:auto 1fr;gap:10mm;align-items:end">
+      <div>
+        <div class="num" style="font-size:44pt;color:var(--goldL);line-height:1">₹12,10,000</div>
+        <div style="font-family:Consolas;font-size:7.6pt;letter-spacing:.2em;color:#8B96A3;margin-top:2mm;text-transform:uppercase">Drawing-Power gap surfaced in a verified live run</div>
+      </div>
+      <div style="text-align:right;font-family:Consolas;font-size:7.6pt;letter-spacing:.2em;color:#6F7A85;text-transform:uppercase;line-height:1.9">
+        Built for Bharat Agentic 2026<br>Understand → Reason → Plan → Use tools → Act → Deliver
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AT A GLANCE -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>At a glance</span></div>
+  <div class="sec-k">At a glance</div>
+  <h1>An investigator, <em>not a chatbot.</em></h1>
+  <p class="lede">Most Indian MSMEs run on a bank cash-credit facility whose usable limit, <strong>Drawing Power</strong>, is recalculated
+    from stock, debtors and creditors every month. When those numbers are stale, mis-aged, duplicated or simply mis-read, the business
+    quietly loses access to capital it is entitled to under its own sanction terms. Nobody inside a small enterprise has the time or
+    specialist skill to check. KARBHARI does.</p>
+
+  <div class="cols3" style="grid-template-columns:repeat(4,1fr);gap:5mm;margin:6mm 0 8mm">
+    <div class="stat"><div class="v" style="color:var(--gold)">₹12.10L</div><div class="l">capacity gap found and matched to hand-computed ground truth, to the rupee</div></div>
+    <div class="stat"><div class="v">11</div><div class="l">tool calls the agent chose, across a 7-document evidence bundle</div></div>
+    <div class="stat"><div class="v">0</div><div class="l">headline figures computed by the language model; Python owns the arithmetic</div></div>
+    <div class="stat"><div class="v">46</div><div class="l">automated tests, including a live end-to-end run against the real model</div></div>
+  </div>
+
+  <div class="cols2" style="grid-template-columns:1fr 1.05fr;gap:10mm">
+    <div>
+      <h2 style="margin-top:0">Contents</h2>
+      <div class="toc">
+        <div class="row"><span class="i">01</span><span class="t">Why KARBHARI exists</span><span class="p">03</span></div>
+        <div class="row"><span class="i">02</span><span class="t">What KARBHARI is</span><span class="p">04</span></div>
+        <div class="row"><span class="i">03</span><span class="t">Drawing Power, explained</span><span class="p">05</span></div>
+        <div class="row"><span class="i">04</span><span class="t">How it works</span><span class="p">06</span></div>
+        <div class="row"><span class="i">05</span><span class="t">The investigation loop</span><span class="p">07</span></div>
+        <div class="row"><span class="i">06</span><span class="t">Features</span><span class="p">08</span></div>
+        <div class="row"><span class="i">07</span><span class="t">Trust and guardrails</span><span class="p">10</span></div>
+        <div class="row"><span class="i">08</span><span class="t">Case study: Suryoday Textiles</span><span class="p">11</span></div>
+        <div class="row"><span class="i">09</span><span class="t">The experience</span><span class="p">12</span></div>
+        <div class="row"><span class="i">10</span><span class="t">Technology and deployment</span><span class="p">13</span></div>
+        <div class="row"><span class="i">11</span><span class="t">Limitations and roadmap</span><span class="p">14</span></div>
+      </div>
+    </div>
+    <div>
+      <h2 style="margin-top:0">In one minute</h2>
+      <ul class="clean">
+        <li><strong>What it does.</strong> Takes a case (sanction letter, stock statements, debtor invoices and receipts, creditor ledger, bank
+          statement) and determines whether the bank is recognising the Drawing Power those documents actually support.</li>
+        <li><strong>How it does it.</strong> A bounded agent loop decides what to read and which checks to run. Every number comes from
+          deterministic, tested Python: debtor reconciliation, consistency checks and the Drawing Power formula.</li>
+        <li><strong>What you get.</strong> Graded findings (<span class="chip s">supported</span> <span class="chip u">unresolved</span>
+          <span class="chip c">contradicted</span>), each with evidence quotes, plus the complete trace of how the agent got there.</li>
+        <li><strong>Why it is different.</strong> It is built to be right, not agreeable. It reports what undermines the owner's case as readily as what supports it.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">02</span></div>
+</section>
+
+<!-- 01 WHY -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>01 · Why</span></div>
+  <div class="sec-k">01 · Why KARBHARI exists</div>
+  <h1>Large companies have departments.<br><em>MSMEs have the owner.</em></h1>
+  <p class="lede">Big enterprises do not win only because of software. They win because they employ specialists in every domain (treasury,
+    credit, collections, compliance, analytics) who understand problems that cut across all of them. The owner of a small Indian enterprise
+    has to be all of those people at once.</p>
+
+  <div class="cols2" style="gap:9mm">
+    <div>
+      <h2>The specialist-capability gap</h2>
+      <p>An MSME may have accounting software, a bank portal and a part-time accountant. What it lacks is someone who can look across all of
+        them, understand what a problem actually involves, and act on it. The real challenge is not <em>"MSMEs need better software"</em>. It
+        is that small businesses lack the specialist capacity to understand and coordinate complex, cross-functional problems.</p>
+      <p>KARBHARI's long-term vision is to be that missing operator: a <strong>problem-first</strong> layer where the owner brings a real
+        situation in their own words, and does not need to know which department, professional or software category it belongs to.</p>
+      <h2>Why working capital first</h2>
+      <p>Working capital is where this gap hurts most and is easiest to prove. A cash-credit facility's usable limit moves every month with
+        the stock statement and the debtor book. If the documents behind it are inconsistent, the owner sees only a smaller number at the
+        bank, with no way of knowing whether it is right.</p>
+    </div>
+    <div>
+      <div class="card dark" style="padding:6mm">
+        <div class="tag" style="color:#8B96A3">Where the number goes wrong</div>
+        <div style="font-size:12.5pt;font-weight:700;margin-bottom:3.5mm;color:#fff">Five ways Drawing Power is mis-stated</div>
+        <ol style="margin-left:4.5mm;font-size:9.2pt;line-height:1.55;color:#C9D1DA">
+          <li style="margin-bottom:2.2mm"><b style="color:#fff">Stale or swinging stock statements.</b> A large month-on-month swing, or a statement older than the facility allows, makes the stock figure unreliable.</li>
+          <li style="margin-bottom:2.2mm"><b style="color:#fff">Debtors aged incorrectly.</b> Invoices past the sanctioned cut-off (e.g. 90 days) must be excluded; valid ones must not be.</li>
+          <li style="margin-bottom:2.2mm"><b style="color:#fff">Duplicate ledger entries.</b> The same invoice entered twice inflates the debtor book.</li>
+          <li style="margin-bottom:2.2mm"><b style="color:#fff">Receipts that don't match invoices.</b> Untagged payments, partial payments and over-payments distort what is truly outstanding.</li>
+          <li><b style="color:#fff">Assumed rather than sanctioned terms.</b> Margins and creditor deductions that differ from the sanction letter change the answer.</li>
+        </ol>
+      </div>
+      <div class="callout" style="margin-top:6mm">Errors run in <strong>both directions</strong>. KARBHARI is not built to argue for a bigger number;
+        it is built to find the right one, and to say clearly when the evidence does not support a claim.</div>
+      <div class="callout red" style="margin-top:3mm;font-size:9.4pt">Under RBI's IRACP norms, Drawing Power based on a stock statement more than
+        three months old is irregular; if the irregularity continues for 90 days the account must be classified NPA. KARBHARI states this
+        rule whenever staleness is relevant.</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">03</span></div>
+</section>
+
+<!-- 02 WHAT -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>02 · What</span></div>
+  <div class="sec-k">02 · What KARBHARI is</div>
+  <h1>A business operator that<br><em>investigates before it answers.</em></h1>
+  <p class="lede">KARBHARI is a problem-first agentic product for Indian MSMEs. Its first fully built capability, the
+    <strong>Working Capital Guardian</strong>, works out whether a business's Drawing Power is being correctly recognised, and proves it.</p>
+
+  <div class="cols3" style="margin-bottom:5mm">
+    <div class="card" style="padding:3.6mm 4.4mm"><div class="tag">Understand</div><h3>Reads the whole case</h3><p class="small" style="color:var(--ink2);font-size:8.2pt;line-height:1.4;margin:0">Sanction terms, stock statements, ledgers, invoices, receipts and bank statements, in PDF, Excel, CSV or text.</p></div>
+    <div class="card" style="padding:3.6mm 4.4mm"><div class="tag">Reason and verify</div><h3>Rebuilds the numbers</h3><p class="small" style="color:var(--ink2);font-size:8.2pt;line-height:1.4;margin:0">Reconstructs eligible debtors invoice by invoice, checks periods against each other, and computes Drawing Power under the sanction's own terms.</p></div>
+    <div class="card" style="padding:3.6mm 4.4mm"><div class="tag">Deliver</div><h3>Shows its working</h3><p class="small" style="color:var(--ink2);font-size:8.2pt;line-height:1.4;margin:0">Graded findings with quoted evidence, the money at stake, and the full step-by-step trace of the investigation.</p></div>
+  </div>
+
+  <h2 style="margin-top:0">Not a chatbot, by design</h2>
+  <table class="tight">
+    <thead><tr><th style="width:19%">Question</th><th style="width:29%">Generic AI assistant</th><th>KARBHARI</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Starting point</strong></td><td>A question about business in general</td><td>A specific case with its own documents</td></tr>
+      <tr><td><strong>Who does the maths</strong></td><td>The language model, in prose</td><td>Deterministic, tested Python; the model never states the headline figure</td></tr>
+      <tr><td><strong>Debtor figure</strong></td><td>Copied from a ledger's subtotal line</td><td>Independently rebuilt from invoices and receipts</td></tr>
+      <tr><td><strong>Process</strong></td><td>One-shot answer</td><td>Bounded investigation: the agent chooses which documents and tools, up to 20 steps</td></tr>
+      <tr><td><strong>Output</strong></td><td>Advice ("improve your credit terms")</td><td>Graded findings, amounts and evidence quotes</td></tr>
+      <tr><td><strong>Unfavourable facts</strong></td><td>Often smoothed over</td><td>Actively sought and reported as unresolved or contradicted</td></tr>
+      <tr><td><strong>Auditability</strong></td><td>None</td><td>Every thought, tool input and tool output logged and shown in the UI</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2" style="margin-top:5mm;gap:8mm">
+    <div class="card">
+      <div class="tag">Who it is for</div>
+      <ul class="clean" style="font-size:8.6pt;line-height:1.42">
+        <li>Small manufacturers, traders and distributors with a stock-and-debtor cash-credit facility</li>
+        <li>Family-run enterprises without a treasury or credit team</li>
+        <li>Accountants checking a client's Drawing Power</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">What it will never claim</div>
+      <ul class="clean" style="font-size:8.6pt;line-height:1.42">
+        <li>What a bank <em>will</em> do, or that money is legally owed</li>
+        <li>Any number that a tool did not produce</li>
+        <li>More credit than sanctioned: the limit is always the hard ceiling</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">04</span></div>
+</section>
+
+<!-- 03 DRAWING POWER -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>03 · Drawing Power</span></div>
+  <div class="sec-k">03 · Drawing Power, explained</div>
+  <h1>The number your bank uses,<br><em>and how KARBHARI rebuilds it.</em></h1>
+  <p class="lede">A cash-credit facility is sanctioned up to a limit, but the business can only draw what its current collateral supports.
+    That figure is Drawing Power. KARBHARI computes it in exactly one place in the codebase, <code>calculations/drawing_power.py</code>.</p>
+
+  <div class="formula">
+    <div class="cap">Stock and book-debt hypothecation · standard formula</div>
+    <div class="f">DP = Stock × (1 − <span class="g">stock margin</span>) + Eligible debtors × (1 − <span class="g">debtor margin</span>) − Creditors</div>
+    <div style="font-family:Consolas;font-size:8.4pt;color:#A7B0BA;margin-top:3mm">…then capped between ₹0 and the sanctioned limit. Gaps under ₹1,000 are treated as rounding noise, not findings.</div>
+  </div>
+
+  <h2>Worked example: the verified Suryoday Textiles case</h2>
+  <svg viewBox="0 0 700 270" width="100%" style="display:block;margin:2mm 0 3mm" font-family="Segoe UI">
+    <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2B04A"/><stop offset="1" stop-color="#B8862A"/></linearGradient></defs>
+    <g stroke="#E4E0D6" stroke-width="1">
+      <line x1="40" y1="230" x2="690" y2="230" stroke="#0B0F14" stroke-width="1.4"/>
+      <line x1="40" y1="194" x2="690" y2="194"/><line x1="40" y1="158" x2="690" y2="158"/><line x1="40" y1="122" x2="690" y2="122"/><line x1="40" y1="86" x2="690" y2="86"/><line x1="40" y1="50" x2="690" y2="50"/>
+    </g>
+    <g font-family="Consolas" font-size="9" fill="#8D96A0" text-anchor="end">
+      <text x="34" y="233">0</text><text x="34" y="197">10L</text><text x="34" y="161">20L</text><text x="34" y="125">30L</text><text x="34" y="89">40L</text><text x="34" y="53">50L</text>
+    </g>
+    <rect x="60" y="73.4" width="80" height="156.6" rx="3" fill="url(#gg)"/>
+    <text x="100" y="66" text-anchor="middle" font-family="Bahnschrift" font-weight="700" font-size="13">₹43.50L</text>
+    <text x="100" y="248" text-anchor="middle" font-size="10" font-weight="600">Stock after margin</text>
+    <text x="100" y="261" text-anchor="middle" font-size="8.5" fill="#5E6873" font-family="Consolas">58.00L × 0.75</text>
+    <line x1="140" y1="73.4" x2="170" y2="73.4" stroke="#B8862A" stroke-dasharray="3 3"/>
+    <rect x="170" y="38.8" width="80" height="34.6" rx="3" fill="url(#gg)"/>
+    <text x="210" y="31" text-anchor="middle" font-family="Bahnschrift" font-weight="700" font-size="13">+₹9.60L</text>
+    <text x="210" y="248" text-anchor="middle" font-size="10" font-weight="600">Eligible debtors</text>
+    <text x="210" y="261" text-anchor="middle" font-size="8.5" fill="#5E6873" font-family="Consolas">16.00L × 0.60</text>
+    <line x1="250" y1="38.8" x2="280" y2="38.8" stroke="#B8862A" stroke-dasharray="3 3"/>
+    <rect x="280" y="38.8" width="80" height="32.4" rx="3" fill="#C93C2E"/>
+    <text x="320" y="88" text-anchor="middle" font-family="Bahnschrift" font-weight="700" font-size="13" fill="#C93C2E">−₹9.00L</text>
+    <text x="320" y="248" text-anchor="middle" font-size="10" font-weight="600">Less creditors</text>
+    <text x="320" y="261" text-anchor="middle" font-size="8.5" fill="#5E6873" font-family="Consolas">creditor ledger</text>
+    <line x1="360" y1="71.2" x2="400" y2="71.2" stroke="#B8862A" stroke-dasharray="3 3"/>
+    <rect x="400" y="71.2" width="80" height="158.8" rx="3" fill="#0B0F14"/>
+    <text x="440" y="63" text-anchor="middle" font-family="Bahnschrift" font-weight="700" font-size="13">₹44.10L</text>
+    <text x="440" y="248" text-anchor="middle" font-size="10" font-weight="700">Calculated DP</text>
+    <text x="440" y="261" text-anchor="middle" font-size="8.5" fill="#5E6873" font-family="Consolas">≤ ₹80L limit</text>
+    <rect x="510" y="114.8" width="80" height="115.2" rx="3" fill="#A9B1BA"/>
+    <text x="550" y="107" text-anchor="middle" font-family="Bahnschrift" font-weight="700" font-size="13" fill="#5E6873">₹32.00L</text>
+    <text x="550" y="248" text-anchor="middle" font-size="10" font-weight="600">Reported by bank</text>
+    <text x="550" y="261" text-anchor="middle" font-size="8.5" fill="#5E6873" font-family="Consolas">bank statement</text>
+    <line x1="600" y1="71.2" x2="640" y2="71.2" stroke="#178A5D" stroke-width="1.4"/>
+    <line x1="600" y1="114.8" x2="640" y2="114.8" stroke="#178A5D" stroke-width="1.4"/>
+    <line x1="630" y1="71.2" x2="630" y2="114.8" stroke="#178A5D" stroke-width="2"/>
+    <text x="645" y="90" font-family="Bahnschrift" font-weight="700" font-size="14" fill="#178A5D">₹12.10L</text>
+    <text x="645" y="104" font-family="Consolas" font-size="8.5" fill="#178A5D">GAP</text>
+  </svg>
+
+  <div class="cols2" style="gap:8mm">
+    <div>
+      <h3>Every gap in the inputs is said out loud</h3>
+      <p style="font-size:9.3pt">If an input is missing, the engine does not quietly guess. Each fallback is written into <code>assumptions_used</code>
+        and carried into the finding:</p>
+      <ul class="clean" style="font-size:9pt">
+        <li>No sanctioned margins found → typical 25% / 40% used, and flagged as a placeholder to confirm.</li>
+        <li>No ageing breakdown → total debtors used, and flagged as an <em>upper bound</em>.</li>
+        <li>No creditor figure → treated as zero, and flagged as <em>optimistic</em>.</li>
+        <li>Collateral above the limit → capped, and the cap is recorded.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Any assumption downgrades the verdict</h3>
+      <p style="font-size:9.3pt">A positive gap is graded <span class="chip s">supported</span> only when no assumptions were needed. Otherwise
+        it is <span class="chip u">unresolved</span>. If the calculated figure is at or below what the bank recognises, the finding is
+        <span class="chip c">contradicted</span>: the evidence does not support a claim of lost capacity.</p>
+      <p style="font-size:9.3pt">The gap is framed as headroom <strong>within the existing sanctioned limit</strong>: never a request for more
+        credit, and never a guarantee the bank will release it.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">05</span></div>
+</section>
+
+<!-- 04 HOW -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>04 · How it works</span></div>
+  <div class="sec-k">04 · How it works</div>
+  <h1>The model reasons.<br><em>Python calculates.</em></h1>
+  <p class="lede">KARBHARI separates judgement from arithmetic. A language model does what it is good at: reading messy documents, deciding
+    what to look at next, and structuring line items. Every number that matters is produced by deterministic code that cannot hallucinate.</p>
+
+  <svg viewBox="0 0 700 330" width="100%" style="display:block;margin:1mm 0 4mm" font-family="Segoe UI">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5E6873"/></marker>
+      <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B8862A"/></marker>
+    </defs>
+    <text x="10" y="16" font-family="Consolas" font-size="8.5" letter-spacing="2" fill="#8D96A0">EVIDENCE</text>
+    <g font-size="9.5" font-weight="600">
+      <rect x="10" y="26" width="120" height="30" rx="4" fill="#fff" stroke="#E4E0D6"/><rect x="10" y="26" width="3.5" height="30" fill="#B8862A"/><text x="22" y="45">Sanction letter</text>
+      <rect x="10" y="62" width="120" height="30" rx="4" fill="#fff" stroke="#E4E0D6"/><rect x="10" y="62" width="3.5" height="30" fill="#1E9A94"/><text x="22" y="81">Stock statements</text>
+      <rect x="10" y="98" width="120" height="30" rx="4" fill="#fff" stroke="#E4E0D6"/><rect x="10" y="98" width="3.5" height="30" fill="#6F55C9"/><text x="22" y="117">Invoices &amp; receipts</text>
+      <rect x="10" y="134" width="120" height="30" rx="4" fill="#fff" stroke="#E4E0D6"/><rect x="10" y="134" width="3.5" height="30" fill="#2F6FB5"/><text x="22" y="153">Creditor ledger</text>
+      <rect x="10" y="170" width="120" height="30" rx="4" fill="#fff" stroke="#E4E0D6"/><rect x="10" y="170" width="3.5" height="30" fill="#C93C2E"/><text x="22" y="189">Bank statement</text>
+    </g>
+    <text x="10" y="222" font-family="Consolas" font-size="8" fill="#8D96A0">PDF · XLSX · CSV · TXT</text>
+    <path d="M132,113 L172,113" stroke="#5E6873" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="175" y="88" width="105" height="50" rx="5" fill="#EFECE4" stroke="#D8D2C4"/>
+    <text x="227" y="109" text-anchor="middle" font-size="10" font-weight="700">Text extraction</text>
+    <text x="227" y="124" text-anchor="middle" font-family="Consolas" font-size="7.5" fill="#5E6873">pypdf · openpyxl · csv</text>
+    <path d="M282,113 L322,113" stroke="#5E6873" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="325" y="20" width="175" height="190" rx="8" fill="#0B0F14"/>
+    <text x="412" y="44" text-anchor="middle" font-family="Consolas" font-size="8" letter-spacing="2" fill="#F2C14E">INVESTIGATOR · LLM</text>
+    <text x="412" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Bounded ReAct loop</text>
+    <text x="412" y="80" text-anchor="middle" font-size="8.8" fill="#A7B0BA">one JSON action per step · max 20</text>
+    <g font-family="Consolas" font-size="8.6" fill="#D5DCE4">
+      <rect x="340" y="94" width="145" height="20" rx="3" fill="#1B232D"/><text x="348" y="108">list_evidence</text>
+      <rect x="340" y="118" width="145" height="20" rx="3" fill="#1B232D"/><text x="348" y="132">read_evidence</text>
+      <rect x="340" y="142" width="145" height="20" rx="3" fill="#2A2410"/><text x="348" y="156" fill="#F2C14E">reconcile_debtors</text>
+      <rect x="340" y="166" width="145" height="20" rx="3" fill="#2A2410"/><text x="348" y="180" fill="#F2C14E">check_consistency</text>
+      <rect x="340" y="190" width="145" height="14" rx="3" fill="#2A2410"/><text x="348" y="200.5" font-size="7.8" fill="#F2C14E">calculate_drawing_power</text>
+    </g>
+    <text x="545" y="16" font-family="Consolas" font-size="8.5" letter-spacing="2" fill="#B8862A">DETERMINISTIC ENGINES</text>
+    <g font-size="9.4">
+      <rect x="545" y="26" width="150" height="50" rx="5" fill="#fff" stroke="#B8862A"/>
+      <text x="555" y="45" font-weight="700">Debtor reconciliation</text><text x="555" y="62" font-size="8" fill="#5E6873" font-family="Consolas">tagged → FIFO → unallocated</text>
+      <rect x="545" y="84" width="150" height="50" rx="5" fill="#fff" stroke="#B8862A"/>
+      <text x="555" y="103" font-weight="700">Consistency check</text><text x="555" y="120" font-size="8" fill="#5E6873" font-family="Consolas">±20% period-over-period</text>
+      <rect x="545" y="142" width="150" height="50" rx="5" fill="#fff" stroke="#B8862A"/>
+      <text x="555" y="161" font-weight="700">Drawing Power engine</text><text x="555" y="178" font-size="8" fill="#5E6873" font-family="Consolas">margins · cap · materiality</text>
+    </g>
+    <path d="M487,152 C515,152 515,51 543,51" stroke="#B8862A" stroke-width="1.3" fill="none" marker-end="url(#arg)"/>
+    <path d="M487,176 C515,176 515,109 543,109" stroke="#B8862A" stroke-width="1.3" fill="none" marker-end="url(#arg)"/>
+    <path d="M487,197 C515,197 515,167 543,167" stroke="#B8862A" stroke-width="1.3" fill="none" marker-end="url(#arg)"/>
+    <text x="620" y="207" text-anchor="middle" font-size="8" fill="#B8862A" font-family="Consolas">reconciled debtors override</text>
+    <text x="620" y="218" text-anchor="middle" font-size="8" fill="#B8862A" font-family="Consolas">the agent's own figure</text>
+    <path d="M412,212 L412,246" stroke="#5E6873" stroke-width="1.4" marker-end="url(#ar)"/>
+    <path d="M620,224 C620,262 520,262 502,262" stroke="#5E6873" stroke-width="1.4" fill="none" marker-end="url(#ar)"/>
+    <rect x="300" y="248" width="200" height="58" rx="6" fill="#fff" stroke="#0B0F14" stroke-width="1.4"/>
+    <text x="400" y="268" text-anchor="middle" font-size="11" font-weight="700">Guardian</text>
+    <text x="400" y="283" text-anchor="middle" font-size="8.4" fill="#5E6873">builds the headline finding in code</text>
+    <text x="400" y="296" text-anchor="middle" font-size="8.4" fill="#5E6873">+ consistency-coverage backstop</text>
+    <path d="M298,277 L232,277" stroke="#5E6873" stroke-width="1.4" marker-end="url(#ar)"/>
+    <rect x="40" y="248" width="190" height="58" rx="6" fill="#0B0F14"/>
+    <text x="135" y="268" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Investigation outcome</text>
+    <text x="135" y="283" text-anchor="middle" font-size="8.4" fill="#A7B0BA">graded findings · amounts · quotes</text>
+    <text x="135" y="296" text-anchor="middle" font-size="8.4" fill="#A7B0BA">full tool trace · stopped reason</text>
+  </svg>
+
+  <div class="cols3">
+    <div class="card"><div class="tag">Enforced in code · 1</div><h3>Headline built by the system</h3><p style="font-size:9pt">The Drawing Power gap finding is constructed by <code>guardian.py</code> straight from the engine's return value. The agent is told not to restate it and has no way to alter it.</p></div>
+    <div class="card"><div class="tag">Enforced in code · 2</div><h3>Reconciled debtors win</h3><p style="font-size:9pt">If debtors were reconciled, <code>calculate_drawing_power</code> overrides whatever eligible-debtor figure the agent passes in, and records the override where it can be seen.</p></div>
+    <div class="card"><div class="tag">Enforced in code · 3</div><h3>Per-debtor isolation</h3><p style="font-size:9pt">Reconciliation groups records by debtor before matching, so one customer's payment can never settle another customer's invoice, whatever the agent sends.</p></div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">06</span></div>
+</section>
+
+<!-- 05 LOOP -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>05 · The loop</span></div>
+  <div class="sec-k">05 · The investigation loop</div>
+  <h1>A real investigation,<br><em>not a fixed pipeline.</em></h1>
+  <p class="lede">Each turn, the model sees the running transcript and returns exactly one action: call a tool, or finish. It decides which
+    documents to read, in what order, and when it has enough. A required checklist keeps it thorough; the step limit keeps it bounded.</p>
+
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:8mm">
+    <div class="steps">
+      <div class="step"><div class="dot">1</div><span class="tool">list_evidence</span><h3>Inventory the case</h3><p style="font-size:9.1pt">See every document attached: ID, filename and category.</p></div>
+      <div class="step"><div class="dot">2</div><span class="tool">read_evidence × every item</span><h3>Read everything, no exceptions</h3><p style="font-size:9.1pt">The agent must read every item, even ones that look redundant. A document it did not read cannot inform its conclusion. Figures it uses must be traceable to a quote it actually saw.</p></div>
+      <div class="step"><div class="dot">3</div><span class="tool">check_consistency</span><h3>Compare periods</h3><p style="font-size:9.1pt">If two documents or periods report the same field (two stock statements a month apart is the classic case), flag any swing of 20% or more for a human to explain.</p></div>
+      <div class="step"><div class="dot">4</div><span class="tool">reconcile_debtors</span><h3>Rebuild the debtor book</h3><p style="font-size:9.1pt">When invoice- or receipt-level data exists, never trust a ledger's subtotal. Reconstruct eligible debtors from line items, as of the evidence's own date.</p></div>
+      <div class="step"><div class="dot">5</div><span class="tool">calculate_drawing_power</span><h3>Compute, or explain why not</h3><p style="font-size:9.1pt">Run the engine with the facility terms and figures found. If inputs are missing, it says exactly which ones.</p></div>
+      <div class="step" style="margin-bottom:0"><div class="dot">6</div><span class="tool">action: finish</span><h3>Report findings</h3><p style="font-size:9.1pt">Everything except the headline gap, which the system adds itself: data-quality issues, ambiguities, and anything that cuts against a favourable conclusion.</p></div>
+    </div>
+    <div>
+      <div class="tag" style="margin-bottom:2mm">ONE STEP, AS THE MODEL RETURNS IT</div>
+<pre>{
+  <span class="k">"thought"</span>: <span class="s">"Two stock statements cover
+    Aug and Sep. Compare them
+    before trusting Sep alone."</span>,
+  <span class="k">"action"</span>: <span class="s">"call_tool"</span>,
+  <span class="k">"tool"</span>: <span class="s">"check_consistency"</span>,
+  <span class="k">"tool_input"</span>: {
+    <span class="k">"field_history"</span>: {
+      <span class="k">"stock_value"</span>: [
+        {<span class="k">"period_label"</span>: <span class="s">"Aug-26"</span>, <span class="k">"value"</span>: 4200000},
+        {<span class="k">"period_label"</span>: <span class="s">"Sep-26"</span>, <span class="k">"value"</span>: 5800000}
+      ]
+    }
+  },
+  <span class="k">"findings"</span>: null
+}
+<span class="c">→ 1 variance flag: stock value +38.1%</span></pre>
+      <div class="card" style="margin-top:5mm">
+        <div class="tag">Loop mechanics</div>
+        <ul class="clean" style="font-size:8.9pt">
+          <li><strong>Bounded:</strong> 20 tool calls maximum, so cost and runtime stay predictable.</li>
+          <li><strong>Resilient:</strong> one shared retry budget absorbs API errors and malformed or corrupted JSON, both observed in real runs.</li>
+          <li><strong>Forgiving where safe:</strong> if the model mistakenly "calls" <code>finish_investigation</code> as a tool, it is treated as a finish, not a wasted step.</li>
+          <li><strong>Recorded:</strong> every step's thought, tool, input and output is saved as the trace.</li>
+          <li><strong>Honest stop reasons:</strong> complete, incomplete (step limit or invalid action), or error.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">07</span></div>
+</section>
+
+<!-- 06 FEATURES 1 -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>06 · Features</span></div>
+  <div class="sec-k">06 · Features</div>
+  <h1 style="font-size:24pt;margin-bottom:3mm">What it does, <em>and why.</em></h1>
+  <div class="cols2" style="gap:4mm">
+    <div class="feat"><div class="n">01</div><div class="bar" style="background:var(--gold)"></div>
+      <h3>Case and evidence workspace</h3>
+      <p>Create a case per business, drop in evidence and tag each file with a category. A completeness checklist shows what is still missing.</p>
+      <ul><li>Reads PDF, XLSX, CSV and plain text</li><li>Each document bounded to 20,000 characters for predictable prompts</li><li>Scanned PDFs without a text layer are flagged plainly and never crash the run</li></ul>
+      <div class="why"><b>WHY</b>Real MSME records arrive in every format. A bad file becomes a visible gap, not a broken investigation.</div>
+    </div>
+    <div class="feat"><div class="n">02</div><div class="bar" style="background:var(--ink)"></div>
+      <h3>Bounded agentic investigator</h3>
+      <p>A ReAct-style loop in which the model chooses which documents to read, which checks to run, and when to stop, up to 20 steps.</p>
+      <ul><li>Required checklist: read everything, compare periods, rebuild debtors, compute</li><li>Single JSON action protocol with retries</li><li>Provider-agnostic LLM client (Gemini today)</li></ul>
+      <div class="why"><b>WHY</b>Every case is shaped differently. A fixed pipeline breaks on the second case; an unbounded agent is expensive and unpredictable.</div>
+    </div>
+    <div class="feat"><div class="n">03</div><div class="bar" style="background:var(--violet)"></div>
+      <h3>Deterministic debtor reconciliation</h3>
+      <p>Rebuilds outstanding and <em>eligible</em> debtors from invoices and receipts, per debtor, as of the evidence's own date.</p>
+      <ul><li>Three-tier matching: invoice-tagged → FIFO against the same debtor's oldest open invoices → explicitly unallocated</li><li>Duplicate invoices detected and excluded, with the amount shown</li><li>Ageing checked against the sanctioned cut-off (e.g. 90 days)</li></ul>
+      <div class="why"><b>WHY</b>A ledger subtotal is someone else's arithmetic. Tally-style ledgers rarely tag receipts, so FIFO by debtor is how a credit analyst would do it.</div>
+    </div>
+    <div class="feat"><div class="n">04</div><div class="bar" style="background:var(--teal)"></div>
+      <h3>Period-over-period consistency</h3>
+      <p>Flags any field (stock, debtors, creditors) that moves 20% or more between consecutive periods, and any figure that appears from zero.</p>
+      <ul><li>Threshold configurable per call</li><li>Flags, never explains: the agent and the human judge the cause</li></ul>
+      <div class="why"><b>WHY</b>A big swing may be growth, seasonality or a data error. It should never pass silently into a Drawing Power figure.</div>
+    </div>
+    <div class="feat"><div class="n">05</div><div class="bar" style="background:var(--gold)"></div>
+      <h3>Drawing Power engine</h3>
+      <p>The single place the number is computed: sanctioned margins, eligible debtors, creditor deduction, capped at the limit, compared with the bank's figure.</p>
+      <ul><li>Every fallback recorded in <code>assumptions_used</code></li><li>Missing inputs listed by name and source document</li><li>₹1,000 materiality threshold</li></ul>
+      <div class="why"><b>WHY</b>Money arithmetic must be exact, repeatable and testable. Language models are none of those things.</div>
+    </div>
+    <div class="feat"><div class="n">06</div><div class="bar" style="background:var(--grn)"></div>
+      <h3>Graded findings with citations</h3>
+      <p>Each finding carries a status, a plain-language explanation, the rupee impact where known, evidence IDs and exact quotes.</p>
+      <div style="margin:1.5mm 0"><span class="chip s">supported</span> <span class="chip u">unresolved</span> <span class="chip c">ineligible / contradicted</span></div>
+      <div class="why"><b>WHY</b>An owner taking a finding to the bank needs to know how sure it is, and exactly which line of which document backs it.</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">08</span></div>
+</section>
+
+<!-- 06 FEATURES 2 -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>06 · Features</span></div>
+  <div class="cols2" style="gap:4mm">
+    <div class="feat"><div class="n">07</div><div class="bar" style="background:var(--blue)"></div>
+      <h3>"How it investigated": the full trace</h3>
+      <p>Every step the agent took is shown as a timeline: its reasoning, the tool it chose, the exact input, the raw output and a one-line summary.</p>
+      <ul><li>Generated live from the actual run, not reconstructed afterwards</li><li>Stored with the investigation for later review</li></ul>
+      <div class="why"><b>WHY</b>"Trust me" is not good enough for money. An owner, accountant or banker should be able to follow the reasoning step by step.</div>
+    </div>
+    <div class="feat"><div class="n">08</div><div class="bar" style="background:var(--red)"></div>
+      <h3>Honesty guardrails</h3>
+      <p>The investigator is told to look actively for what undermines a favourable result (stale statements, duplicates, unallocated receipts, unexplained swings) and to report it.</p>
+      <ul><li>No numeric claim a tool didn't produce</li><li>No claims about what a bank will do</li><li>"Appears supportable under the supplied facility terms", never "the bank owes you"</li></ul>
+      <div class="why"><b>WHY</b>An advocacy engine would be useless in front of a credit officer. Credibility is the product.</div>
+    </div>
+    <div class="feat"><div class="n">09</div><div class="bar" style="background:#D6A640"></div>
+      <h3>Coverage backstop</h3>
+      <p>If the case has several period-specific documents of the same category but the agent never ran a consistency check, the system adds an explicit <span class="chip u">unresolved</span> finding saying so.</p>
+      <ul><li>Never invents a variance; only reports the gap in coverage</li><li>Based on a cheap deterministic signal, not a re-read</li></ul>
+      <div class="why"><b>WHY</b>Where the agent's discipline was observed to be unreliable, the gap is made visible in code instead of hoping a prompt fixes it.</div>
+    </div>
+    <div class="feat"><div class="n">10</div><div class="bar" style="background:var(--ink)"></div>
+      <h3>Film-grade investigation console</h3>
+      <p>A dark financial-investigation console with a persistent rail: <em>Findings · Investigation · Evidence · How it investigated · Actions</em>.</p>
+      <ul><li>Count-up headline, KPI strip, capacity bars, eligibility ring</li><li>Full-screen view of the agent reading each document while it runs</li><li>Subtle synthesized sound effects, with a mute toggle</li></ul>
+      <div class="why"><b>WHY</b>The answer is one number; the confidence comes from being able to drill into everything behind it, and enjoying doing so.</div>
+    </div>
+    <div class="feat"><div class="n">11</div><div class="bar" style="background:var(--teal)"></div>
+      <h3>aiKart "Try Me Now" sandbox</h3>
+      <p>A one-shot adapter that calls the same service layer as the web app. By default it runs a bundled six-document demo case through the real engines and returns a full markdown report.</p>
+      <ul><li>Manifest: 1 CPU, 1 GB RAM, 120 s timeout</li><li>Network egress limited to the Gemini API</li></ul>
+      <div class="why"><b>WHY</b>One implementation, two front doors, and a buyer sees a real result even without uploading files.</div>
+    </div>
+    <div class="feat"><div class="n">12</div><div class="bar" style="background:var(--violet)"></div>
+      <h3>Packaged and tested</h3>
+      <p>A single Docker image serves the API and the built console. 46 automated tests cover extraction, reconciliation, consistency, Drawing Power, tools, the sandbox and the API, plus a live model run.</p>
+      <ul><li>The full 7-document case verified inside the container</li><li>Real bugs found in verification became permanent regression tests</li></ul>
+      <div class="why"><b>WHY</b>For a financial tool, "it worked on my laptop once" is not evidence. Reproducibility is.</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">09</span></div>
+</section>
+
+<!-- 07 TRUST -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>07 · Trust</span></div>
+  <div class="sec-k">07 · Trust and guardrails</div>
+  <h1>Built to be right,<br><em>not agreeable.</em></h1>
+  <p class="lede">A tool that tells an owner what they want to hear is worse than no tool. KARBHARI's guardrails live in three places:
+    the prompt, the tools, and the code that assembles the final result.</p>
+
+  <h2>How a finding is graded</h2>
+  <table style="margin-bottom:6mm">
+    <thead><tr><th style="width:24%">Status</th><th>Meaning</th><th style="width:33%">Typical example</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip s">supported</span></td><td>Evidence and a tool output directly back it, with no assumptions needed.</td><td>Calculated DP exceeds reported DP using sanctioned margins and reconciled debtors.</td></tr>
+      <tr><td><span class="chip u">unresolved</span></td><td>Evidence is incomplete or ambiguous, an assumption was needed, or more documents are required.</td><td>A ₹70,000 receipt that cannot be allocated to any open invoice.</td></tr>
+      <tr><td><span class="chip c">ineligible / contradicted</span></td><td>The evidence contradicts a favourable claim, or a sanction-term condition is not met.</td><td>An invoice aged 105 days against a 90-day eligibility cut-off.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2" style="gap:8mm">
+    <div>
+      <h2 style="margin-top:0">Rules the investigator follows</h2>
+      <ul class="clean" style="font-size:9.3pt">
+        <li>Never state a number a tool didn't produce; never invent or round a figure it didn't see.</li>
+        <li>Actively look for what undermines a favourable conclusion, and report it.</li>
+        <li>Never assert what a bank will do or that a figure is legally guaranteed.</li>
+        <li>State the RBI IRACP staleness rule when a stock statement is more than three months old, as the general rule, not as something that has already happened.</li>
+        <li>If nothing was found beyond the headline, finish with no extra findings. No filler.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Rules enforced in code</h2>
+      <ul class="clean" style="font-size:9.3pt">
+        <li>The headline gap finding is built from the engine output, never from the agent's words.</li>
+        <li>Reconciled eligible debtors override the agent-supplied value, and the override is shown.</li>
+        <li>Records are segregated per debtor before any matching.</li>
+        <li>Duplicate invoices and unallocated receipts are always reported, never silently dropped.</li>
+        <li>Any assumption downgrades a gap from supported to unresolved.</li>
+        <li>A skipped consistency check becomes a visible unresolved finding.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card dark" style="margin-top:7mm;display:grid;grid-template-columns:auto 1fr;gap:7mm;align-items:center;padding:6mm 7mm">
+    <div class="num" style="font-size:40pt;color:var(--goldL);line-height:1">5</div>
+    <div style="font-size:9.6pt;color:#C9D1DA"><b style="color:#fff">real issues were found by verification and documented openly</b>: four fixed, one mitigated. They include
+      payments from one debtor settling another's invoice, which is now prevented in code and covered by a regression test. KARBHARI's README
+      lists what is real, what is stubbed, and what is not yet reliable.</div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">10</span></div>
+</section>
+
+<!-- 08 CASE STUDY -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>08 · Case study</span></div>
+  <div class="sec-k">08 · Case study</div>
+  <h1>Suryoday Textiles Pvt Ltd:<br><em>₹12,10,000, to the rupee.</em></h1>
+  <p class="lede">A deliberately difficult 7-document bundle was built, and the true answer was calculated by hand <strong>before</strong> the agent
+    ran. Then KARBHARI investigated it live, on the real model, in 11 tool calls.</p>
+
+  <div class="cols2" style="gap:7mm">
+    <div>
+      <h2 style="margin-top:0">The evidence, with traps built in</h2>
+      <table>
+        <thead><tr><th>Document</th><th>What made it hard</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Sanction letter</strong> (PDF)</td><td>₹80L limit; 25% / 40% margins; 90-day debtor eligibility; 3-month staleness rule</td></tr>
+          <tr><td><strong>Stock statements</strong> × 2</td><td>Aug ₹42L → Sep ₹58L: a deliberate +38.1% swing</td></tr>
+          <tr><td><strong>Invoices</strong></td><td>9 invoices across 5 debtors, including one duplicate ledger row</td></tr>
+          <tr><td><strong>Receipts</strong></td><td>4 receipts: one tagged-partial, one untagged (FIFO), one over-payment</td></tr>
+          <tr><td><strong>Creditor ledger</strong></td><td>₹9L sundry creditors</td></tr>
+          <tr><td><strong>Bank statement</strong></td><td>Reported Drawing Power ₹32L</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Ground truth vs. the live run</h2>
+      <table>
+        <thead><tr><th>Figure</th><th class="r">By hand</th><th class="r">KARBHARI</th></tr></thead>
+        <tbody>
+          <tr><td>Eligible debtors</td><td class="r num">₹16,00,000</td><td class="r num" style="color:var(--grn)">₹16,00,000</td></tr>
+          <tr><td>Calculated DP</td><td class="r num">₹44,10,000</td><td class="r num" style="color:var(--grn)">₹44,10,000</td></tr>
+          <tr><td>Reported DP</td><td class="r num">₹32,00,000</td><td class="r num" style="color:var(--grn)">₹32,00,000</td></tr>
+          <tr class="tot"><td>Gap</td><td class="r num">₹12,10,000</td><td class="r num" style="color:var(--gold)">₹12,10,000</td></tr>
+        </tbody>
+      </table>
+      <div class="card" style="margin-top:5mm;background:#F3F0E8;border-color:#E4E0D6">
+        <div style="font-family:Consolas;font-size:8.6pt;line-height:1.7">₹58L × 0.75 + ₹16L × 0.60 − ₹9L<br>= ₹43.5L + ₹9.6L − ₹9L = <b>₹44.10L</b><br>₹44.10L − ₹32.00L = <b style="color:var(--gold)">₹12.10L</b></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>What the agent caught on its own</h2>
+  <div class="cols2" style="gap:5mm">
+    <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:4mm;align-items:start"><span class="chip c">excluded</span><div style="font-size:9.2pt"><strong>Duplicate invoice, ₹3,50,000:</strong> the same invoice entered twice; removed from the debtor book with the excluded amount shown.</div></div>
+    <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:4mm;align-items:start"><span class="chip u">flagged</span><div style="font-size:9.2pt"><strong>Unallocated receipt, ₹70,000:</strong> an over-payment with no open invoice left to apply it to.</div></div>
+    <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:4mm;align-items:start"><span class="chip c">ineligible</span><div style="font-size:9.2pt"><strong>105-day-old invoice:</strong> past the sanctioned 90-day cut-off, so excluded from eligible debtors.</div></div>
+    <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:4mm;align-items:start"><span class="chip u">flagged</span><div style="font-size:9.2pt"><strong>Stock +38.1% in one month:</strong> caught by <code>check_consistency</code>; worth confirming before relying on September alone.</div></div>
+  </div>
+  <p class="small" style="margin-top:4mm">5 findings in total, split across supported, unresolved and contradicted, not one-sided. The same figures were reproduced inside the Docker image.</p>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">11</span></div>
+</section>
+
+<!-- 09 EXPERIENCE -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>09 · Experience</span></div>
+  <div class="sec-k">09 · The experience</div>
+  <h1>From a pile of documents<br><em>to a defensible answer.</em></h1>
+  <p class="lede" style="margin-bottom:4mm">The owner, or their accountant, never configures a workflow. They open a case, drop in what they have, and ask
+    KARBHARI to investigate.</p>
+
+  <div class="cols2" style="gap:5mm;margin-bottom:5mm">
+    <div><img class="shot" src="guide-assets/v2_03_overlay.jpg"><div class="capt">Investigating · the agent reads each real document</div></div>
+    <div><img class="shot" src="guide-assets/v2_04_findings.jpg" style="height:41.2mm;object-fit:cover;object-position:top"><div class="capt">Findings · graded, cited, backed by tested code</div></div>
+  </div>
+
+  <table class="tight">
+    <thead><tr><th style="width:24%">View</th><th>What it shows</th><th style="width:30%">Built for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lobby</strong></td><td>Open a case, the verified benchmark, a sample of the agent at work, how it works</td><td>First impression</td></tr>
+      <tr><td><strong>Headline and KPI strip</strong></td><td>The capacity gap with count-up animation, plus calculated DP, bank figure, findings and evidence</td><td>The owner's first glance</td></tr>
+      <tr><td><strong>Findings</strong></td><td>Graded findings with amounts, explanations and evidence quotes, plus a summary tile</td><td>Deciding what to raise with the bank</td></tr>
+      <tr><td><strong>Investigation</strong></td><td>Capacity bars, eligibility ring, invoice-level table, variance cards, assumptions</td><td>The accountant's check</td></tr>
+      <tr><td><strong>Evidence</strong></td><td>Drag-and-drop upload, category chips, document cards and a completeness checklist</td><td>Keeping the case complete</td></tr>
+      <tr><td><strong>How it investigated</strong></td><td>The step-by-step timeline: thought, tool, input, output</td><td>Audit and explanation</td></tr>
+      <tr><td><strong>Actions</strong></td><td>Previews of the next phase: draft note to bank, evidence pack, follow-up checklist, monthly watch</td><td>Turning findings into action</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2" style="margin-top:5mm;gap:6mm">
+    <div class="card dark">
+      <div class="tag" style="color:#8B96A3">Design language</div>
+      <p style="font-size:9pt;color:#C9D1DA;margin:0">Borrowed from KARBHARI's launch film: a near-black stage, a drifting dot grid, precise numerals and colour that always
+        means something: gold for capacity, red for problems, green for verified. Motion and quiet sound effects make results land.</p>
+    </div>
+    <div class="card">
+      <div class="tag">aiKart "Try Me Now"</div>
+      <p style="font-size:9pt;margin:0">aiKart inputs can't accept file uploads, so the sandbox runs a bundled six-document demo case through the same
+        engines and returns the full report: a ₹2,20,000 gap, the debtor table and graded findings.</p>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">12</span></div>
+</section>
+
+<!-- 10 TECH -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>10 · Technology</span></div>
+  <div class="sec-k">10 · Technology and deployment</div>
+  <h1>Small, boring, <em>verifiable.</em></h1>
+  <p class="lede">A deliberately compact stack: easy to audit, quick to run, and packaged as one container.</p>
+
+  <div class="cols2" style="gap:8mm">
+    <div>
+      <h2 style="margin-top:0">Stack</h2>
+      <table>
+        <tbody>
+          <tr><td style="width:34%"><strong>API</strong></td><td>Python 3.12 · FastAPI · Uvicorn</td></tr>
+          <tr><td><strong>Data</strong></td><td>SQLModel on SQLite; investigation results stored as JSON</td></tr>
+          <tr><td><strong>Extraction</strong></td><td>pypdf (PDF) · openpyxl (Excel) · csv · plain text</td></tr>
+          <tr><td><strong>Model</strong></td><td>Provider-agnostic <code>LLMClient</code>; Google Gemini via REST today</td></tr>
+          <tr><td><strong>Engines</strong></td><td>Pure Python: reconciliation, consistency, Drawing Power</td></tr>
+          <tr><td><strong>Console</strong></td><td>React 19 · TypeScript · Vite · Web Audio for sound effects</td></tr>
+          <tr><td><strong>Packaging</strong></td><td>Single Docker image serving API and built console</td></tr>
+        </tbody>
+      </table>
+      <h2>API</h2>
+      <table style="font-family:Consolas;font-size:8pt">
+        <tbody>
+          <tr><td><b>GET</b></td><td>/api/health</td></tr>
+          <tr><td><b>POST · GET</b></td><td>/api/cases</td></tr>
+          <tr><td><b>GET</b></td><td>/api/cases/{case_id}</td></tr>
+          <tr><td><b>GET</b></td><td>/api/cases/{case_id}/evidence/categories</td></tr>
+          <tr><td><b>POST · GET</b></td><td>/api/cases/{case_id}/evidence</td></tr>
+          <tr><td><b>DELETE</b></td><td>/api/cases/{case_id}/evidence/{evidence_id}</td></tr>
+          <tr><td><b>POST</b></td><td>/api/cases/{case_id}/investigate</td></tr>
+          <tr><td><b>GET</b></td><td>/api/cases/{case_id}/investigations</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Test coverage: 46 tests</h2>
+      <table>
+        <thead><tr><th>Suite</th><th class="r">Tests</th></tr></thead>
+        <tbody>
+          <tr><td>Debtor reconciliation</td><td class="r num">11</td></tr>
+          <tr><td>Document extraction</td><td class="r num">7</td></tr>
+          <tr><td>aiKart sandbox (incl. demo case)</td><td class="r num">7</td></tr>
+          <tr><td>Drawing Power engine</td><td class="r num">6</td></tr>
+          <tr><td>Consistency checks</td><td class="r num">5</td></tr>
+          <tr><td>Agent tools (incl. the override rule)</td><td class="r num">4</td></tr>
+          <tr><td>Cases and evidence API</td><td class="r num">4</td></tr>
+          <tr><td>Health</td><td class="r num">1</td></tr>
+          <tr><td>Live end-to-end run on the real model*</td><td class="r num">1</td></tr>
+          <tr class="tot"><td>Total</td><td class="r num">46</td></tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top:2mm">* Skipped automatically when no API key is configured.</p>
+      <h2>Run it</h2>
+<pre><span class="c"># published image</span>
+docker run -p 8000:8000 \
+  --env-file backend/.env \
+  yieldnever/karbhari:0.7.0
+
+<span class="c"># tests</span>
+cd backend &amp;&amp; python -m pytest -q</pre>
+    </div>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">13</span></div>
+</section>
+
+<!-- 11 LIMITS & ROADMAP -->
+<section class="page">
+  <div class="hdr"><span><b>KARBHARI</b> &nbsp; Working Capital Guardian</span><span>11 · Roadmap</span></div>
+  <div class="sec-k">11 · Limitations and roadmap</div>
+  <h1>What's real today,<br><em>and what comes next.</em></h1>
+  <p class="lede">KARBHARI states its limits as plainly as its findings. These are the known gaps at v0.7.0.</p>
+
+  <div class="cols2" style="gap:8mm">
+    <div>
+      <h2 style="margin-top:0">Known limitations</h2>
+      <ul class="clean" style="font-size:9.2pt">
+        <li><strong>The agent sometimes skips a check.</strong> It may skip <code>check_consistency</code> or finish before calculating. The code backstop makes the gap visible and a re-run usually completes it, but it is not forced.</li>
+        <li><strong>Creditor-side reconciliation is simple:</strong> one total, not invoice- and payment-level.</li>
+        <li><strong>Cross-document conflicts</strong> (two documents disagreeing on one figure) are not explicitly re-detected in the agent version.</li>
+        <li><strong>One case family verified</strong> in depth; not yet tested on 10+ documents, contradictory evidence, non-English text or illegible uploads.</li>
+        <li><strong>No OCR</strong> for scanned PDFs; <strong>no authentication</strong>; evidence categories are advisory.</li>
+        <li><strong>Run time varies</strong> with the model's response time, typically 30 seconds to 2 minutes.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="margin-top:0">Roadmap</h2>
+      <div class="steps">
+        <div class="step"><div class="dot">→</div><h3>Close the consistency gap</h3><p style="font-size:9pt">Native function-calling with enforced tool sequencing, or a stronger model tier.</p></div>
+        <div class="step"><div class="dot">→</div><h3>Turn findings into action</h3><p style="font-size:9pt">The Actions tab, already previewed in the console: a draft, evidence-backed note to the bank requesting a Drawing Power recomputation.</p></div>
+        <div class="step"><div class="dot">→</div><h3>Harder cases</h3><p style="font-size:9pt">Contradictory documents, more debtors, illegible uploads: find the next failure before a user does.</p></div>
+        <div class="step"><div class="dot">→</div><h3>Deeper evidence</h3><p style="font-size:9pt">OCR for scanned statements; invoice-level creditor reconciliation; cross-document conflict detection.</p></div>
+        <div class="step" style="margin-bottom:0"><div class="dot">→</div><h3>Beyond working capital</h3><p style="font-size:9pt">Delayed receivables, compliance notices, supplier disputes: the same investigate-then-prove pattern, problem-first.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:7mm;background:#F3F0E8;border-color:#E4E0D6">
+    <div class="tag">Deliberately out of scope for v0.7.0</div>
+    <p style="font-size:9.2pt;margin:0">TReDS and banking API integrations, autonomous actions on the owner's behalf, and multi-agent orchestration. KARBHARI investigates and
+      recommends; the owner decides and acts.</p>
+  </div>
+  <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">14</span></div>
+</section>
+
+<!-- BACK COVER -->
+<section class="page dark" style="padding:0">
+  <div class="dots"></div>
+  <div class="glow" style="width:170mm;height:170mm;background:rgba(242,193,78,.14);left:20mm;top:70mm"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20mm">
+    <div style="font-family:Consolas;font-weight:700;font-size:7.6pt;letter-spacing:.22em;white-space:nowrap;color:var(--goldL);margin-bottom:8mm">READ EVERY DOCUMENT · CROSS-CHECK EVERY NUMBER · PROVE EVERY RUPEE</div>
+    <div style="font-weight:900;font-size:58pt;letter-spacing:.08em;color:#fff;line-height:1">KARBHARI</div>
+    <div style="width:60mm;height:1.6mm;background:var(--goldL);margin:7mm 0"></div>
+    <div style="font-family:Consolas;font-weight:700;font-size:10pt;letter-spacing:.42em;color:#C9D1DA">WORKING CAPITAL GUARDIAN</div>
+    <div style="font-size:19pt;font-weight:600;color:#fff;margin-top:14mm">Find what your numbers are hiding.</div>
+  </div>
+  <div style="position:absolute;bottom:14mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-family:Consolas;font-size:7.2pt;letter-spacing:.2em;color:#6F7A85;text-transform:uppercase">
+    <span>Product document · v0.7.0 · October 2026</span><span>Built for Bharat Agentic 2026</span>
+  </div>
+</section>
+
+</body>
+</html>

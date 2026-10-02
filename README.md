@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="aiKart: Try Me Now Sandbox Ready" src="https://img.shields.io/badge/aiKart-Try%20Me%20Now%20Sandbox%20Ready-E8702A"></a>
-  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.6.0-2496ED?logo=docker&logoColor=white"></a>
+  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.7.0-2496ED?logo=docker&logoColor=white"></a>
   <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
   <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
   <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
@@ -39,7 +39,7 @@ Every MSME on a bank cash-credit line can only draw what its **Drawing Power** a
 - 🧑‍💼 **Nobody has time to check.** Big companies have treasury teams. A small business has the owner.
 - 🤖 **Chatbots don't solve it.** They give advice, do maths in prose and can't show their working.
 
-KARBHARI gives a **defensible answer in under a minute**, honest enough to take to your banker or CA.
+KARBHARI gives a **defensible answer in minutes, not days**, honest enough to take to your banker or CA.
 
 ## 🗺️ How it works
 
@@ -121,7 +121,7 @@ A console built like a financial-investigation film: precise numerals, a quiet d
 ## 🇮🇳 Bharat feasibility
 
 - **Works with what MSMEs already have.** Bank PDFs, Tally and Excel exports, CSVs. No new data entry, no bank integration.
-- **Cheap to run.** One container, 1 CPU and 1 GB RAM, Gemini Flash-Lite free tier. About 25 seconds per case.
+- **Cheap to run.** One container, 1 CPU and 1 GB RAM, Gemini Flash-Lite free tier. Typically 30 seconds to 2 minutes per case.
 - **Trusted by the people who matter.** Banks and CAs can audit every figure, because the arithmetic lives in code and every finding cites its source.
 - **Honest by design.** It reports what weakens the owner's case as readily as what helps it, so it holds up in front of a credit officer.
 - **Big addressable need.** India has over 6 crore MSMEs (Ministry of MSME), and working capital is the most common pain point for the ones with bank credit.
@@ -138,7 +138,7 @@ A console built like a financial-investigation film: precise numerals, a quiet d
 | **Console** | Film-style UI: count-up figures, transitions, live investigation overlay, synthesized sound effects (mutable) |
 | **Stack** | FastAPI · SQLModel/SQLite · React 19 + TypeScript + Vite · Docker |
 | **Quality** | 46 automated tests, including a live end-to-end run against Gemini |
-| **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.6.0` |
+| **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.7.0` |
 
 ## 🚀 How to run
 
@@ -147,8 +147,8 @@ A console built like a financial-investigation film: precise numerals, a quiet d
 **2. Start it with Docker** (recommended):
 
 ```bash
-docker build -t karbhari:0.6.0 .
-run.bat        # or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.6.0
+docker build -t karbhari:0.7.0 .
+run.bat        # or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.7.0
 ```
 
 Open **http://127.0.0.1:8000** 🎉
