@@ -13,7 +13,7 @@ metadata:
 
 runtime:
   type: docker
-  image: "docker.io/yieldnever/karbhari:0.5.0"
+  image: "docker.io/yieldnever/karbhari:0.6.0"
   # Overrides the image's default CMD (which runs the full web app) so the
   # sandbox instead runs one-shot through the same service layer.
   command: ["python", "-m", "app.aikart.entrypoint"]
@@ -24,10 +24,16 @@ resources:
   timeoutSeconds: 120
 
 inputs:
+  - name: mode
+    label: "What would you like to run?"
+    type: select
+    required: false
+    options: ["Run the bundled demo case (Suryoday Textiles, 6 documents)", "Describe my own problem"]
+    default: "Run the bundled demo case (Suryoday Textiles, 6 documents)"
   - name: message
-    label: "Describe your working-capital problem"
+    label: "Describe your working-capital problem (optional for the demo case)"
     type: textarea
-    required: true
+    required: false
 
 output:
   format: markdown
