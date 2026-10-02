@@ -13,9 +13,10 @@ Per the aiKart Agent Manifest guide:
   - the result must be written to /aikart/output.json as
     {"format": "...", "response": "..."}
   - the manifest's inputs[] only support text/textarea/number/boolean/select
-    fields (no file upload), so this sandbox path exercises case creation +
-    the investigation stub on a text description only. The richer
-    evidence-upload workflow is exercised through the normal web app.
+    fields (no file upload). By default the `mode` select runs the bundled
+    demo case (see demo_case.py) through the real deterministic engines;
+    "Describe my own problem" creates a case from the text alone. The full
+    evidence-upload workflow with the live agent runs in the web app.
 """
 
 from __future__ import annotations
