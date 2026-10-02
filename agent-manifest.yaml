@@ -13,7 +13,7 @@ metadata:
 
 runtime:
   type: docker
-  image: "docker.io/yieldnever/karbhari:0.3.0"
+  image: "docker.io/yieldnever/karbhari:0.5.0"
   # Overrides the image's default CMD (which runs the full web app) so the
   # sandbox instead runs one-shot through the same service layer.
   command: ["python", "-m", "app.aikart.entrypoint"]

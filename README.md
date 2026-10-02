@@ -1,6 +1,59 @@
-# KARBHARI — Working Capital Guardian
+<p align="center"><img src="docs/karbhari-logo.png" width="104" alt="KARBHARI logo"></p>
 
-**P2: a real bounded investigation, not a fixed pipeline.** KARBHARI now runs
+<h1 align="center">KARBHARI (कारभारी) — Working Capital Guardian</h1>
+
+<p align="center"><b>Find what your numbers are hiding.</b><br>
+An agentic investigator for Indian MSMEs: it reads a business's bank-facility evidence, reconstructs
+Drawing Power with deterministic, tested code, and reports graded, evidence-cited findings.</p>
+
+<p align="center">
+  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="aiKart: Try Me Now Sandbox Ready" src="https://img.shields.io/badge/aiKart-Try%20Me%20Now%20Sandbox%20Ready-E8702A"></a>
+  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.5.0-2496ED?logo=docker&logoColor=white"></a>
+  <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
+  <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
+  <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
+  <img alt="Tests: 41 passing" src="https://img.shields.io/badge/tests-41%20passing-2EA44F">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue"></a>
+</p>
+
+<p align="center">Built for <b>Bharat Agentic 2026</b> · Powered by aiKart</p>
+
+---
+
+## Start here
+
+| | |
+|---|---|
+| 🎬 **Explainer film** (52 s) | [`Karbhari Explainer Video.mp4`](Karbhari%20Explainer%20Video.mp4) |
+| 📘 **Product document** — what it does, how, and why | [`Karbhari-Product-Document.pdf`](Karbhari-Product-Document.pdf) |
+| 🧭 **Project guide** — how to run and use it, with screenshots | [`Karbhari-Project-Guide.pdf`](Karbhari-Project-Guide.pdf) |
+| 🧪 **Try it on real files** | [`ASSETS FOR TESTING/`](ASSETS%20FOR%20TESTING) — six documents for a sample case |
+
+<p align="center"><img src="docs/screenshot-findings.jpg" width="900" alt="KARBHARI findings view on the bundled test case"></p>
+<p align="center"><sub>Live run on the bundled test case: calculated Drawing Power ₹25,70,000 vs ₹23,50,000 recognised by the bank — a ₹2,20,000 gap, with ₹6,00,000 of debtors excluded as past the 90-day cut-off.</sub></p>
+
+### Quick start
+
+```bash
+# 1. put your Google AI Studio key in backend/.env  (see backend/.env.example)
+# 2. build and run the whole product in one container
+docker build -t karbhari:0.5.0 .
+run.bat                      # Windows; or: docker run -p 8000:8000 --env-file backend/.env karbhari:0.5.0
+# 3. open http://127.0.0.1:8000, create a case, attach the files in "ASSETS FOR TESTING", click Run investigation
+```
+
+### aiKart "Try Me Now"
+
+[`agent-manifest.yaml`](agent-manifest.yaml) runs the public image `docker.io/yieldnever/karbhari:0.5.0` through
+`app.aikart.entrypoint`. The image is published on Docker Hub and the entrypoint has been verified from it with
+networking disabled. aiKart inputs are text-only (no file upload), so the sandbox creates a case from the
+description; the full evidence investigation runs in the web app.
+
+---
+
+## How it works
+
+**A real bounded investigation, not a fixed pipeline.** KARBHARI runs
 an actual agent loop: it decides what evidence to read, independently
 reconstructs debtor eligibility from invoice/receipt-level records (not a
 ledger's own subtotal), checks period-over-period consistency, and only then
@@ -172,9 +225,15 @@ cd backend
 ## Docker
 
 ```bash
-docker build -t karbhari:0.3.0 .
-docker run -p 8000:8000 --env-file backend/.env karbhari:0.3.0
+docker build -t karbhari:0.5.0 .
+docker run -p 8000:8000 --env-file backend/.env karbhari:0.5.0
+# or pull the published image:
+docker pull yieldnever/karbhari:0.5.0
 ```
+
+**Current image (P3): `docker.io/yieldnever/karbhari:0.5.0`**, public on Docker Hub. The aiKart sandbox
+entrypoint was re-verified by pulling the published image and running it with `--network none`.
+The verification below was originally done on the P2 image (`0.3.0`):
 
 **Rebuilt and verified against P2** (image `karbhari:0.3.0`): ran the full
 7-document demo case (real PDF, two stock periods, multi-debtor invoices/
@@ -189,7 +248,7 @@ volume-mounted `/aikart`:
 mkdir -p aikart_test
 echo '{"message":"..."}' > aikart_test/input.json
 docker run --rm -v "$(pwd)/aikart_test:/aikart" --env-file backend/.env \
-  --entrypoint python karbhari:0.3.0 -m app.aikart.entrypoint
+  --entrypoint python yieldnever/karbhari:0.5.0 -m app.aikart.entrypoint
 ```
 One caveat from this verification run specifically: the evidence files were
 uploaded without setting a `category` on each one, which meant the
@@ -232,3 +291,7 @@ asks for a category.
 - Re-test with a deliberately harder case (contradictory documents, more
   debtors, a genuinely illegible upload) to find the next real failure mode
   before a judge does.
+
+## License
+
+Released under the [Apache License 2.0](LICENSE).
