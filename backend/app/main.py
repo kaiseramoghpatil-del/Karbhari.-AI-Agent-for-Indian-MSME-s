@@ -46,7 +46,14 @@ app.include_router(investigation.router)
 # as the whole product in Docker/aiKart, without a separate frontend server.
 if FRONTEND_DIST.exists():
     app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+    _DIST_ROOT = FRONTEND_DIST.resolve()
 
     @app.get("/{full_path:path}")
     def spa(full_path: str) -> FileResponse:
-        return FileResponse(FRONTEND_DIST / "index.html")
+        # Root-level build files (favicon.svg, favicon.png, ...) are served as
+        # themselves; every other path falls back to the SPA's index.html.
+        # The resolved path must stay inside dist, so "../" can't escape it.
+        candidate = (_DIST_ROOT / full_path).resolve()
+        if full_path and candidate.is_file() and candidate.is_relative_to(_DIST_ROOT):
+            return FileResponse(candidate)
+        return FileResponse(_DIST_ROOT / "index.html")
