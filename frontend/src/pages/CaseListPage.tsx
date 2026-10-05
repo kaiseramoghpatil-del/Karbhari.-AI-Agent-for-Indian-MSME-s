@@ -330,7 +330,7 @@ export function CaseListPage() {
         <footer className="lobby-foot">
           <span className="display foot-mark">KARBHARI</span>
           <span className="label">Read every document · Cross-check every number · Prove every rupee</span>
-          <span className="label">Bharat Agentic 2026</span>
+          <span className="label">Built for Indian MSMEs</span>
         </footer>
       </main>
     </div>

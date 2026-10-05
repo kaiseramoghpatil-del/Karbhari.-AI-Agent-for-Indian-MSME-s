@@ -1,5 +1,5 @@
 """
-Entrypoint for aiKart's "Try Me Now" sandbox (Method 1 submission).
+Entrypoint for aiKart's "Try Me Now" sandbox.
 
 This script is the aiKart-side adapter, not a second implementation of
 KARBHARI. It reads the buyer's input, then calls the exact same

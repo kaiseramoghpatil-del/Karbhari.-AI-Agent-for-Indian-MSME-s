@@ -2,7 +2,7 @@
 Database engine and session management (SQLite via SQLModel).
 
 SQLite is a deliberate Phase 0 choice: zero setup, file-based, trivially
-inspectable, and entirely adequate for a hackathon's case/evidence metadata
+inspectable, and entirely adequate for case/evidence metadata at this scale
 volume. Swapping to Postgres later only touches this file and config.py.
 """
 

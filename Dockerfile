@@ -1,10 +1,9 @@
 # KARBHARI -- single image, two execution modes.
 #
 # Default (CMD): runs the normal web application (FastAPI serving its own
-# API plus the built frontend) -- used for local hosting / API Endpoint
-# submission.
+# API plus the built frontend) -- used for local hosting and API access.
 #
-# aiKart "Try Me Now" sandbox (Method 1 submission): the agent-manifest.yaml
+# aiKart "Try Me Now" sandbox: the agent-manifest.yaml
 # overrides the container's command to run the aiKart entrypoint script
 # instead. Both paths call the exact same backend/app/services code --
 # see backend/app/aikart/entrypoint.py -- this is one application, not two.

@@ -118,7 +118,7 @@ A console built like a financial-investigation film: precise numerals, a quiet d
   </tr>
 </table>
 
-## 🇮🇳 Bharat feasibility
+## 🇮🇳 Why it works in India
 
 - **Works with what MSMEs already have.** Bank PDFs, Tally and Excel exports, CSVs. No new data entry, no bank integration.
 - **Cheap to run.** One container, 1 CPU and 1 GB RAM, Gemini Flash-Lite free tier. Typically 30 seconds to 2 minutes per case.
@@ -203,4 +203,4 @@ We built a tricky 7-document case and worked out the right answer **by hand firs
 
 ## 📄 License
 
-[Apache 2.0](LICENSE) · Built for **Bharat Agentic 2026** · Powered by aiKart
+[Apache 2.0](LICENSE) · Built for Indian MSMEs
