@@ -131,7 +131,7 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
     <div class="stat"><div class="v" style="color:var(--gold)">₹12.10L</div><div class="l">capacity gap found and matched to hand-computed ground truth, to the rupee</div></div>
     <div class="stat"><div class="v">11</div><div class="l">tool calls the agent chose, across a 7-document evidence bundle</div></div>
     <div class="stat"><div class="v">0</div><div class="l">headline figures computed by the language model; Python owns the arithmetic</div></div>
-    <div class="stat"><div class="v">59</div><div class="l">automated tests, including a live end-to-end run against the real model</div></div>
+    <div class="stat"><div class="v">52</div><div class="l">automated tests, including a live end-to-end run against the real model</div></div>
   </div>
 
   <div class="cols2" style="grid-template-columns:1fr 1.05fr;gap:10mm">
@@ -537,14 +537,14 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
       <div class="why"><b>WHY</b>The answer is one number; the confidence comes from being able to drill into everything behind it, and enjoying doing so.</div>
     </div>
     <div class="feat"><div class="n">11</div><div class="bar" style="background:var(--teal)"></div>
-      <h3>aiKart "Try Me Now" sandbox</h3>
-      <p>A one-shot adapter that calls the same service layer as the web app. By default it runs a bundled six-document demo case through the real engines and returns a full markdown report.</p>
-      <ul><li>Manifest: 1 CPU, 1 GB RAM, 120 s timeout</li><li>Network egress limited to the Gemini API</li></ul>
-      <div class="why"><b>WHY</b>One implementation, two front doors, and a buyer sees a real result even without uploading files.</div>
+      <h3>Resilient agent loop</h3>
+      <p>If the model tries to finish before calculating Drawing Power, it is sent back once to do so. Gemini rate limits are waited out as requested instead of failing the run.</p>
+      <ul><li>Premature finishes deferred once, visible in the trace</li><li>Rate-limit waits capped at 45 s, never an infinite loop</li></ul>
+      <div class="why"><b>WHY</b>A missing headline or a failed run in front of a banker costs more trust than a few extra seconds.</div>
     </div>
     <div class="feat"><div class="n">12</div><div class="bar" style="background:var(--violet)"></div>
       <h3>Packaged and tested</h3>
-      <p>A single Docker image serves the API and the built console. 59 automated tests cover extraction, reconciliation, consistency, Drawing Power, tools, the agent loop, the sandbox, the API and frontend serving, plus a live model run.</p>
+      <p>A single Docker image serves the API and the built console. 52 automated tests cover extraction, reconciliation, consistency, Drawing Power, tools, the agent loop, the API and frontend serving, plus a live model run.</p>
       <ul><li>The full 7-document case verified inside the container</li><li>Real bugs found in verification became permanent regression tests</li></ul>
       <div class="why"><b>WHY</b>For a financial tool, "it worked on my laptop once" is not evidence. Reproducibility is.</div>
     </div>
@@ -687,9 +687,9 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
         means something: gold for capacity, red for problems, green for verified. Motion and quiet sound effects make results land.</p>
     </div>
     <div class="card">
-      <div class="tag">aiKart "Try Me Now"</div>
-      <p style="font-size:9pt;margin:0">aiKart inputs can't accept file uploads, so the sandbox runs a bundled six-document demo case through the same
-        engines and returns the full report: a ₹2,20,000 gap, the debtor table and graded findings.</p>
+      <div class="tag">Runs anywhere</div>
+      <p style="font-size:9pt;margin:0">One Docker command starts the whole product: API, agent and console. Case data moves freely between Windows
+        and the Linux container, and the six files in ASSETS FOR TESTING make a complete sample case.</p>
     </div>
   </div>
   <div class="ftr"><span>Product document · v0.7.0</span><span class="pg">12</span></div>
@@ -731,13 +731,12 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
       </table>
     </div>
     <div>
-      <h2 style="margin-top:0">Test coverage: 59 tests</h2>
+      <h2 style="margin-top:0">Test coverage: 52 tests</h2>
       <table>
         <thead><tr><th>Suite</th><th class="r">Tests</th></tr></thead>
         <tbody>
           <tr><td>Debtor reconciliation</td><td class="r num">11</td></tr>
           <tr><td>Document extraction</td><td class="r num">7</td></tr>
-          <tr><td>aiKart sandbox (incl. demo case)</td><td class="r num">7</td></tr>
           <tr><td>Drawing Power engine</td><td class="r num">6</td></tr>
           <tr><td>Consistency checks</td><td class="r num">5</td></tr>
           <tr><td>Agent loop (finish guard, rate limits)</td><td class="r num">7</td></tr>
@@ -747,7 +746,7 @@ ul.clean li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;heigh
           <tr><td>Evidence storage paths (Windows / Linux)</td><td class="r num">3</td></tr>
           <tr><td>Health</td><td class="r num">1</td></tr>
           <tr><td>Live end-to-end run on the real model*</td><td class="r num">1</td></tr>
-          <tr class="tot"><td>Total</td><td class="r num">59</td></tr>
+          <tr class="tot"><td>Total</td><td class="r num">52</td></tr>
         </tbody>
       </table>
       <p class="small" style="margin-top:2mm">* Skipped automatically when no API key is configured.</p>

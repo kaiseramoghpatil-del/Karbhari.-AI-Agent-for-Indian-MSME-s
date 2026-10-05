@@ -4,8 +4,7 @@ Central configuration for KARBHARI.
 Kept deliberately small for Phase 0: just enough settings for the database
 location and where uploaded evidence files are stored on disk, both
 overridable via environment variables so the same code works unchanged in
-local dev, Docker, and the aiKart sandbox (which only guarantees a writable
-filesystem inside the container, not a specific path convention).
+local dev and Docker.
 """
 
 from __future__ import annotations

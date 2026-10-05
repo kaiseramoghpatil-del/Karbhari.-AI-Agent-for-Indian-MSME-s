@@ -1,12 +1,5 @@
-# KARBHARI -- single image, two execution modes.
-#
-# Default (CMD): runs the normal web application (FastAPI serving its own
-# API plus the built frontend) -- used for local hosting and API access.
-#
-# aiKart "Try Me Now" sandbox: the agent-manifest.yaml
-# overrides the container's command to run the aiKart entrypoint script
-# instead. Both paths call the exact same backend/app/services code --
-# see backend/app/aikart/entrypoint.py -- this is one application, not two.
+# KARBHARI -- a single image: FastAPI serving its own API plus the built
+# frontend, used for local hosting and API access.
 
 # ---- Stage 1: build the frontend ----
 FROM node:20-slim AS frontend-build
@@ -31,6 +24,4 @@ RUN mkdir -p /app/backend/data/uploads
 
 EXPOSE 8000
 
-# Default: the web application. aiKart overrides this via its manifest's
-# runtime.command to ["python", "-m", "app.aikart.entrypoint"] instead.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

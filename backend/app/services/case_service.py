@@ -2,10 +2,8 @@
 Case service layer.
 
 Deliberately plain functions over a SQLModel Session, with no FastAPI
-imports anywhere in this module. Both the HTTP routers and the aiKart
-sandbox entrypoint call into these same functions, which is how "the same
-application/service layer" requirement is satisfied without two
-implementations of case logic.
+imports anywhere in this module, so the HTTP routers and any other caller
+(tests, scripts) share one implementation of case logic.
 """
 
 from __future__ import annotations

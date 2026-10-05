@@ -210,7 +210,7 @@ export function CaseListPage() {
         <section className="stats">
           {[
             { v: cases.length, f: (n: number) => Math.round(n).toString(), l: 'Cases in this workspace', c: '' },
-            { v: 59, f: (n: number) => Math.round(n).toString(), l: 'Automated tests passing', c: 'grn' },
+            { v: 52, f: (n: number) => Math.round(n).toString(), l: 'Automated tests passing', c: 'grn' },
             { v: 20, f: (n: number) => Math.round(n).toString(), l: 'Max agent steps · bounded', c: '' },
             { v: 0, f: () => '0', l: 'Rupee figures from the LLM', c: 'gold' },
           ].map((s, i) => (

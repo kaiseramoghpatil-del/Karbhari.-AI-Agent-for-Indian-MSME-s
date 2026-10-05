@@ -43,7 +43,7 @@ app.include_router(evidence.router)
 app.include_router(investigation.router)
 
 # Serve the built frontend (if present) so the same container/process works
-# as the whole product in Docker/aiKart, without a separate frontend server.
+# as the whole product in Docker, without a separate frontend server.
 if FRONTEND_DIST.exists():
     app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
     _DIST_ROOT = FRONTEND_DIST.resolve()

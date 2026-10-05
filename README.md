@@ -6,12 +6,11 @@
 <p align="center"><b>Find what your numbers are hiding.</b> 🔍</p>
 
 <p align="center">
-  <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="aiKart: Try Me Now Sandbox Ready" src="https://img.shields.io/badge/aiKart-Try%20Me%20Now%20Sandbox%20Ready-E8702A"></a>
   <a href="https://hub.docker.com/r/yieldnever/karbhari"><img alt="Docker image" src="https://img.shields.io/badge/Docker-yieldnever%2Fkarbhari%3A0.7.0-2496ED?logo=docker&logoColor=white"></a>
   <img alt="API: FastAPI" src="https://img.shields.io/badge/API-FastAPI%200.115-009688?logo=fastapi&logoColor=white">
   <img alt="LLM: Google Gemini" src="https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=googlegemini&logoColor=white">
   <img alt="Frontend: React 19 + TypeScript" src="https://img.shields.io/badge/UI-React%2019%20%2B%20TypeScript-61DAFB?logo=react&logoColor=black">
-  <img alt="Tests: 59 passing" src="https://img.shields.io/badge/tests-59%20passing-2EA44F">
+  <img alt="Tests: 52 passing" src="https://img.shields.io/badge/tests-52%20passing-2EA44F">
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue"></a>
 </p>
 
@@ -137,8 +136,8 @@ A console built like a financial-investigation film: precise numerals, a quiet d
 | **Outputs** | Capacity gap, graded findings with evidence quotes, invoice-level reconciliation, step-by-step trace |
 | **Console** | Film-style UI: count-up figures, transitions, live investigation overlay, synthesized sound effects (mutable) |
 | **Stack** | FastAPI · SQLModel/SQLite · React 19 + TypeScript + Vite · Docker |
-| **Quality** | 59 automated tests, including a live end-to-end run against Gemini |
-| **aiKart** | `agent-manifest.yaml` · public image `docker.io/yieldnever/karbhari:0.7.0` |
+| **Quality** | 52 automated tests, including a live end-to-end run against Gemini |
+| **Docker** | Public image `docker.io/yieldnever/karbhari:0.7.0` |
 
 ## 🚀 How to run
 
@@ -187,8 +186,6 @@ Everything you need is in [`ASSETS FOR TESTING/`](ASSETS%20FOR%20TESTING).
 | Capacity gap | **₹2,20,000** |
 | Ineligible debtors | INV-1002 and INV-1005, past 90 days, **₹6,00,000** excluded |
 | Period swings | Stock +25%, debtors +29.4%, creditors +33.3% |
-
-**On aiKart?** Click **Try Me Now** and keep the default *Run the bundled demo case*. The sandbox runs these same six documents through KARBHARI's real engines and returns the full report. (aiKart's sandbox is text-only with no LLM key, so the documents are pre-transcribed into line items; the report says so.)
 
 ## ✅ Verified, not just demoed
 

@@ -5,7 +5,7 @@ Storage is deliberately simple for Phase 0 -- files land on local disk under
 UPLOAD_DIR/<case_id>/<evidence_id>_<original_filename>. That is an
 abstraction boundary, not a permanent design: swapping to object storage
 later only touches `_write_file`/`_delete_file` in this module, nothing
-upstream (routers, aiKart entrypoint) needs to change.
+upstream (routers, agent tools) needs to change.
 """
 
 from __future__ import annotations
