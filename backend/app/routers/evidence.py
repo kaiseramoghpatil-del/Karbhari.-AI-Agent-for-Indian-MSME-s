@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlmodel import Session
 
@@ -6,6 +8,16 @@ from ..models.evidence import EVIDENCE_CATEGORIES, EvidenceRead
 from ..services import case_service, evidence_service
 
 router = APIRouter(prefix="/api/cases/{case_id}/evidence", tags=["evidence"])
+
+ALLOWED_EXTENSIONS = {".pdf", ".xlsx", ".xlsm", ".csv", ".txt"}
+ALLOWED_CONTENT_TYPES = {
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel.sheet.macroenabled.12",
+    "application/vnd.ms-excel",
+    "text/csv",
+    "text/plain",
+}
 
 
 def _require_case(session: Session, case_id: str):
@@ -28,6 +40,17 @@ async def upload_evidence(
     session: Session = Depends(get_session),
 ) -> EvidenceRead:
     _require_case(session, case_id)
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No filename provided")
+
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"File extension '{ext}' not allowed")
+
+    if file.content_type and file.content_type.lower() not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail=f"Content type '{file.content_type}' not allowed")
+
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="Uploaded file is empty")

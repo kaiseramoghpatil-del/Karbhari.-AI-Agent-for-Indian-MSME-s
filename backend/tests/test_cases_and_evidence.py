@@ -71,3 +71,28 @@ def test_investigate_with_no_evidence_is_honest(client):
     resp = client.get(f"/api/cases/{case_id}/investigations")
     assert resp.status_code == 200
     assert len(resp.json()) == 1
+
+
+def test_evidence_rejects_invalid_file_type(client):
+    case = client.post("/api/cases", json={"name": "Invalid File Case"}).json()
+    case_id = case["id"]
+
+    # Test invalid extension
+    files = {"file": ("malicious.exe", b"MZ...", "application/x-msdownload")}
+    resp = client.post(
+        f"/api/cases/{case_id}/evidence",
+        files=files,
+        data={"category": "other"},
+    )
+    assert resp.status_code == 400
+    assert "not allowed" in resp.json()["detail"].lower()
+
+    # Test valid extension but invalid content type
+    files2 = {"file": ("sneaky.txt", b"alert('xss')", "text/html")}
+    resp2 = client.post(
+        f"/api/cases/{case_id}/evidence",
+        files=files2,
+        data={"category": "other"},
+    )
+    assert resp2.status_code == 400
+    assert "not allowed" in resp2.json()["detail"].lower()
