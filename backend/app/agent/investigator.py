@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import asyncio
 import time
 
 from ..llm.base import LLMClient, LLMError
@@ -72,7 +73,7 @@ class InvestigationRun:
         self.toolbox = toolbox
 
 
-def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> InvestigationRun:
+async def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> InvestigationRun:
     toolbox = InvestigatorToolbox(evidence)
     trace: list[ToolCallRecord] = []
     transcript_steps: list[dict] = []  # internal, carries full tool_output for prompt building
@@ -111,7 +112,7 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
         while attempt < LLM_CALL_RETRIES + 1:
             attempt += 1
             try:
-                raw = llm.generate_json(INVESTIGATOR_SYSTEM_PROMPT, user_prompt, temperature=0.15)
+                raw = await llm.generate_json(INVESTIGATOR_SYSTEM_PROMPT, user_prompt, temperature=0.15)
             except LLMError as exc:
                 last_exc = exc
                 # Free-tier quota (429) asks the caller to wait ~15-20 s; honour
@@ -121,13 +122,13 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
                     rate_limit_waits += 1
                     attempt -= 1
                     logger.warning("Rate limited at step %s; waiting %.0f s before retrying.", step, wait)
-                    time.sleep(wait)
+                    await asyncio.sleep(wait)
                     continue
                 logger.warning(
                     "Investigator LLM call failed at step %s, attempt %s: %s", step, attempt, exc
                 )
                 if attempt <= LLM_CALL_RETRIES:
-                    time.sleep(LLM_RETRY_DELAY_SECONDS)
+                    await asyncio.sleep(LLM_RETRY_DELAY_SECONDS)
                 continue
 
             last_raw = raw
@@ -139,7 +140,7 @@ def run_investigation(llm: LLMClient, evidence: list[Evidence]) -> Investigation
                 step, attempt, raw[:300],
             )
             if attempt <= LLM_CALL_RETRIES:
-                time.sleep(LLM_RETRY_DELAY_SECONDS)
+                await asyncio.sleep(LLM_RETRY_DELAY_SECONDS)
 
         if action is None and last_raw is None:
             return InvestigationRun(trace, [], f"llm_error: {last_exc}", toolbox)

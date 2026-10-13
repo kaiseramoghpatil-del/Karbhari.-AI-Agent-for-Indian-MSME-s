@@ -24,7 +24,7 @@ class GeminiClient(LLMClient):
         self._model = model
         self._timeout = timeout_seconds
 
-    def generate_json(
+    async def generate_json(
         self,
         system_prompt: str,
         user_prompt: str,
@@ -42,9 +42,10 @@ class GeminiClient(LLMClient):
         }
 
         try:
-            resp = httpx.post(
-                url, params={"key": self._api_key}, json=payload, timeout=self._timeout
-            )
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(
+                    url, params={"key": self._api_key}, json=payload, timeout=self._timeout
+                )
         except httpx.HTTPError as exc:
             raise LLMError(f"Gemini request failed: {exc}") from exc
 

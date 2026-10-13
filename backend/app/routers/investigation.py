@@ -22,11 +22,11 @@ def _to_read(investigation: Investigation) -> InvestigationRead:
 
 
 @router.post("/investigate", response_model=InvestigationRead)
-def investigate(case_id: str, session: Session = Depends(get_session)) -> InvestigationRead:
+async def investigate(case_id: str, session: Session = Depends(get_session)) -> InvestigationRead:
     case = case_service.get_case(session, case_id)
     if case is None:
         raise HTTPException(status_code=404, detail="Case not found")
-    investigation = investigation_service.run_investigation(session, case)
+    investigation = await investigation_service.run_investigation(session, case)
     return _to_read(investigation)
 
 
