@@ -95,9 +95,23 @@ def test_malformed_file_does_not_crash(tmp_path: Path):
     f = tmp_path / "broken.pdf"
     f.write_bytes(b"not actually a pdf")
     text = extract_text(f, "application/pdf", "broken.pdf")
-    assert "Could not extract text" in text
+    assert "Failed to extract text:" in text
 
 
 def test_missing_file_does_not_crash(tmp_path: Path):
     text = extract_text(tmp_path / "does_not_exist.txt", "text/plain", "does_not_exist.txt")
     assert "missing from storage" in text
+
+
+def test_extract_text_exception_handling(tmp_path: Path, monkeypatch):
+    f = tmp_path / "error.pdf"
+    f.write_bytes(b"dummy content")
+
+    def mock_extract_pdf(data: bytes):
+        raise Exception("Simulated parsing error")
+
+    import app.services.document_extraction
+    monkeypatch.setattr(app.services.document_extraction, "_extract_pdf", mock_extract_pdf)
+
+    text = extract_text(f, "application/pdf", "error.pdf")
+    assert "[Failed to extract text: Simulated parsing error]" in text
