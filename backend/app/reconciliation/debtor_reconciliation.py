@@ -75,42 +75,13 @@ def _dedupe_invoices(invoices: list[Invoice]) -> tuple[list[Invoice], list[Dupli
     return list(seen.values()), duplicates
 
 
-def _reconcile_one_debtor(
-    invoices: list[Invoice],
-    receipts: list[Receipt],
-    eligible_aging_days: float,
-    as_of: date,
-) -> DebtorReconciliationResult:
-    """Reconciles invoices/receipts already known to belong to ONE debtor."""
-    deduped_invoices, duplicates = _dedupe_invoices(invoices)
-    deduped_invoices = sorted(deduped_invoices, key=lambda i: i.date)
-
-    balance: dict[str, float] = {inv.invoice_id: inv.amount for inv in deduped_invoices}
-    paid: dict[str, float] = {inv.invoice_id: 0.0 for inv in deduped_invoices}
-    invoice_by_id = {inv.invoice_id: inv for inv in deduped_invoices}
-
-    unallocated: list[UnallocatedReceipt] = []
-
-    tagged = [r for r in receipts if r.matched_invoice_id]
-    untagged = [r for r in receipts if not r.matched_invoice_id]
-
-    # Tier 1: tagged receipts applied directly.
-    for r in tagged:
-        if r.matched_invoice_id not in invoice_by_id:
-            unallocated.append(
-                UnallocatedReceipt(
-                    receipt_id=r.receipt_id,
-                    amount=r.amount,
-                    reason=f"References unknown invoice_id {r.matched_invoice_id!r}.",
-                )
-            )
-            continue
-        inv_id = r.matched_invoice_id
-        paid[inv_id] += r.amount
-        balance[inv_id] -= r.amount
-
-    # Tier 2: untagged receipts, FIFO oldest-open-invoice-first within this
-    # debtor only, never applied to an invoice dated after the receipt.
+def _apply_untagged_receipts(
+    untagged: list[Receipt],
+    deduped_invoices: list[Invoice],
+    balance: dict[str, float],
+    paid: dict[str, float],
+    unallocated: list[UnallocatedReceipt],
+) -> None:
     for r in sorted(untagged, key=lambda x: x.date):
         remaining = r.amount
         for inv in deduped_invoices:
@@ -138,6 +109,14 @@ def _reconcile_one_debtor(
                 )
             )
 
+
+def _build_invoice_results(
+    deduped_invoices: list[Invoice],
+    balance: dict[str, float],
+    paid: dict[str, float],
+    eligible_aging_days: float,
+    as_of: date,
+) -> tuple[list[InvoiceReconciliation], float, float]:
     results: list[InvoiceReconciliation] = []
     total_outstanding = 0.0
     total_eligible = 0.0
@@ -185,10 +164,65 @@ def _reconcile_one_debtor(
             )
         )
 
+    return results, round(total_outstanding, 2), round(total_eligible, 2)
+
+
+def _apply_tagged_receipts(
+    tagged: list[Receipt],
+    invoice_by_id: dict[str, Invoice],
+    balance: dict[str, float],
+    paid: dict[str, float],
+    unallocated: list[UnallocatedReceipt],
+) -> None:
+    for r in tagged:
+        if r.matched_invoice_id not in invoice_by_id:
+            unallocated.append(
+                UnallocatedReceipt(
+                    receipt_id=r.receipt_id,
+                    amount=r.amount,
+                    reason=f"References unknown invoice_id {r.matched_invoice_id!r}.",
+                )
+            )
+            continue
+        inv_id = r.matched_invoice_id
+        paid[inv_id] += r.amount
+        balance[inv_id] -= r.amount
+
+
+def _reconcile_one_debtor(
+    invoices: list[Invoice],
+    receipts: list[Receipt],
+    eligible_aging_days: float,
+    as_of: date,
+) -> DebtorReconciliationResult:
+    """Reconciles invoices/receipts already known to belong to ONE debtor."""
+    deduped_invoices, duplicates = _dedupe_invoices(invoices)
+    deduped_invoices = sorted(deduped_invoices, key=lambda i: i.date)
+
+    balance: dict[str, float] = {inv.invoice_id: inv.amount for inv in deduped_invoices}
+    paid: dict[str, float] = {inv.invoice_id: 0.0 for inv in deduped_invoices}
+    invoice_by_id = {inv.invoice_id: inv for inv in deduped_invoices}
+
+    unallocated: list[UnallocatedReceipt] = []
+
+    tagged = [r for r in receipts if r.matched_invoice_id]
+    untagged = [r for r in receipts if not r.matched_invoice_id]
+
+    # Tier 1: tagged receipts applied directly.
+    _apply_tagged_receipts(tagged, invoice_by_id, balance, paid, unallocated)
+
+    # Tier 2: untagged receipts, FIFO oldest-open-invoice-first within this
+    # debtor only, never applied to an invoice dated after the receipt.
+    _apply_untagged_receipts(untagged, deduped_invoices, balance, paid, unallocated)
+
+    results, total_outstanding, total_eligible = _build_invoice_results(
+        deduped_invoices, balance, paid, eligible_aging_days, as_of
+    )
+
     return DebtorReconciliationResult(
         invoices=results,
-        total_outstanding=round(total_outstanding, 2),
-        total_eligible_outstanding=round(total_eligible, 2),
+        total_outstanding=total_outstanding,
+        total_eligible_outstanding=total_eligible,
         duplicate_invoices=duplicates,
         unallocated_receipts=unallocated,
         warnings=[],
