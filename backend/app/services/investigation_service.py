@@ -10,9 +10,9 @@ from ..models.investigation import Investigation
 from . import evidence_service
 
 
-def run_investigation(session: Session, case: Case) -> Investigation:
+async def run_investigation(session: Session, case: Case) -> Investigation:
     evidence = evidence_service.list_evidence(session, case.id)
-    result = WorkingCapitalGuardian().investigate(case.name, evidence)
+    result = await WorkingCapitalGuardian().investigate(case.name, evidence)
 
     investigation = Investigation(
         case_id=case.id,

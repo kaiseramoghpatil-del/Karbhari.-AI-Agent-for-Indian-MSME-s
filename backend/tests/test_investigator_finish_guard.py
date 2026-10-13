@@ -7,6 +7,8 @@ Investigator loop robustness, with a scripted fake LLM (no network, deterministi
 """
 
 import json
+import pytest
+import asyncio
 
 from app.agent import investigator
 from app.agent.investigator import FINISH_DEFERRED_NOTE, run_investigation
@@ -36,14 +38,16 @@ class ScriptedLLM(LLMClient):
         self.actions = list(actions)
         self.prompts: list[str] = []
 
-    def generate_json(self, system_prompt, user_prompt, *, temperature=0.2):
+    async def generate_json(self, system_prompt, user_prompt, *, temperature=0.2):
         self.prompts.append(user_prompt)
         return json.dumps(self.actions.pop(0))
 
 
-def test_premature_finish_is_deferred_then_agent_calculates():
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_premature_finish_is_deferred_then_agent_calculates():
     llm = ScriptedLLM([LIST, FINISH, CALC, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason == "agent_finished"
     assert run.toolbox.last_dp_result is not None
@@ -52,18 +56,22 @@ def test_premature_finish_is_deferred_then_agent_calculates():
     assert FINISH_DEFERRED_NOTE in llm.prompts[2]  # the model was told why
 
 
-def test_second_premature_finish_is_accepted_no_loop():
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_second_premature_finish_is_accepted_no_loop():
     llm = ScriptedLLM([LIST, FINISH, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason == "agent_finished"
     assert run.toolbox.last_dp_result is None  # guardian reports it honestly
     assert [t.tool for t in run.trace] == ["list_evidence", "finish_deferred"]
 
 
-def test_finish_after_calculation_is_not_deferred():
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_finish_after_calculation_is_not_deferred():
     llm = ScriptedLLM([CALC, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason == "agent_finished"
     assert [t.tool for t in run.trace] == ["calculate_drawing_power"]
@@ -76,52 +84,66 @@ class FlakyLLM(ScriptedLLM):
         super().__init__(actions)
         self.errors = list(errors)
 
-    def generate_json(self, system_prompt, user_prompt, *, temperature=0.2):
+    async def generate_json(self, system_prompt, user_prompt, *, temperature=0.2):
         if self.errors:
             raise self.errors.pop(0)
-        return super().generate_json(system_prompt, user_prompt, temperature=temperature)
+        return await super().generate_json(system_prompt, user_prompt, temperature=temperature)
 
 
 QUOTA = LLMError('Gemini API error 429: {"error": {"code": 429, "message": "Quota exceeded. Please retry in 3.5s.", "status": "RESOURCE_EXHAUSTED"}}')
 
 
-def test_rate_limit_waits_as_asked_and_completes(monkeypatch):
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_rate_limit_waits_as_asked_and_completes(monkeypatch):
     sleeps = []
-    monkeypatch.setattr(investigator.time, "sleep", sleeps.append)
+    async def mock_sleep(w):
+        sleeps.append(w)
+    monkeypatch.setattr(investigator.asyncio, "sleep", mock_sleep)
     llm = FlakyLLM([QUOTA, QUOTA, QUOTA], [CALC, FINISH])  # 3 quota errors > normal retry budget
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason == "agent_finished"
     assert run.toolbox.last_dp_result is not None
     assert sleeps == [4.5, 4.5, 4.5]  # Gemini's "retry in 3.5s" + 1 s margin
 
 
-def test_rate_limit_wait_is_capped_and_bounded(monkeypatch):
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_rate_limit_wait_is_capped_and_bounded(monkeypatch):
     sleeps = []
-    monkeypatch.setattr(investigator.time, "sleep", sleeps.append)
+    async def mock_sleep(w):
+        sleeps.append(w)
+    monkeypatch.setattr(investigator.asyncio, "sleep", mock_sleep)
     long_wait = LLMError("Gemini API error 429: RESOURCE_EXHAUSTED. Please retry in 300s.")
     llm = FlakyLLM([long_wait] * 10, [CALC, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason.startswith("llm_error")  # gives up eventually, never hangs
     assert max(sleeps) == investigator.RATE_LIMIT_MAX_WAIT_SECONDS
 
 
-def test_other_errors_keep_the_normal_retry_budget(monkeypatch):
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_other_errors_keep_the_normal_retry_budget(monkeypatch):
     sleeps = []
-    monkeypatch.setattr(investigator.time, "sleep", sleeps.append)
+    async def mock_sleep(w):
+        sleeps.append(w)
+    monkeypatch.setattr(investigator.asyncio, "sleep", mock_sleep)
     boom = LLMError("Gemini API error 500: internal")
     llm = FlakyLLM([boom, boom, boom], [CALC, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.stopped_reason.startswith("llm_error")
     assert sleeps == [investigator.LLM_RETRY_DELAY_SECONDS] * investigator.LLM_CALL_RETRIES
 
 
-def test_mistaken_finish_tool_call_is_also_guarded():
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_mistaken_finish_tool_call_is_also_guarded():
     finish_as_tool = {"thought": "Done.", "action": "call_tool", "tool": "finish_investigation", "tool_input": {}, "findings": None}
     llm = ScriptedLLM([finish_as_tool, CALC, FINISH])
-    run = run_investigation(llm, [])
+    run = await run_investigation(llm, [])
 
     assert run.toolbox.last_dp_result is not None
     assert [t.tool for t in run.trace] == ["finish_deferred", "calculate_drawing_power"]

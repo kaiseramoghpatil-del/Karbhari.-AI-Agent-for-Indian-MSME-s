@@ -19,7 +19,7 @@ class LLMError(RuntimeError):
 
 class LLMClient(ABC):
     @abstractmethod
-    def generate_json(
+    async def generate_json(
         self,
         system_prompt: str,
         user_prompt: str,

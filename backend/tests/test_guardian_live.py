@@ -39,7 +39,9 @@ Outstanding balance: Rs. 2,80,000
 """
 
 
-def test_full_pipeline_against_live_gemini(tmp_path):
+@pytest.mark.anyio
+@pytest.mark.anyio
+async def test_full_pipeline_against_live_gemini(tmp_path):
     init_db()
     with Session(engine) as session:
         case = case_service.create_case(session, CaseCreate(name="Live pipeline test case"))
@@ -61,7 +63,7 @@ def test_full_pipeline_against_live_gemini(tmp_path):
             category="bank_statement",
         )
 
-        result = WorkingCapitalGuardian().investigate(case.name, [ev1, ev2])
+        result = await WorkingCapitalGuardian().investigate(case.name, [ev1, ev2])
 
     assert result.status == "complete"
     assert result.outcome is not None

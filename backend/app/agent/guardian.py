@@ -41,7 +41,7 @@ class InvestigationResult:
 
 
 class WorkingCapitalGuardian:
-    def investigate(self, case_name: str, evidence: list[Evidence]) -> InvestigationResult:
+    async def investigate(self, case_name: str, evidence: list[Evidence]) -> InvestigationResult:
         if not evidence:
             return InvestigationResult(
                 status="no_evidence",
@@ -62,7 +62,7 @@ class WorkingCapitalGuardian:
                 evidence_count_considered=len(evidence),
             )
 
-        run = run_investigation(llm, evidence)
+        run = await run_investigation(llm, evidence)
 
         headline = _headline_finding(run.toolbox.last_dp_result)
         findings: list[Finding] = ([headline] if headline else []) + run.findings
