@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import os
+
 from fastapi import FastAPI  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
@@ -27,12 +29,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="KARBHARI — Working Capital Guardian", lifespan=lifespan)
 
-# Permissive CORS for local development (the Vite dev server runs on a
-# different port than the API). Tightening this is a pre-production task,
-# not a Phase 0 concern.
+# Restrict CORS to allowed origins to prevent unauthorized access.
+# Defaults to local Vite development servers.
+allowed_origins = os.environ.get(
+    "KARBHARI_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
