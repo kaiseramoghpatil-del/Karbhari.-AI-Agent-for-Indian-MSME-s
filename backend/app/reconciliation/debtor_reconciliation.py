@@ -118,11 +118,15 @@ def _reconcile_one_debtor(
                 break
             if inv.date > r.date:
                 continue
-            if balance[inv.invoice_id] <= 0:
+
+            inv_id = inv.invoice_id
+            inv_balance = balance[inv_id]
+            if inv_balance <= 0:
                 continue
-            applied = min(remaining, balance[inv.invoice_id])
-            balance[inv.invoice_id] -= applied
-            paid[inv.invoice_id] += applied
+
+            applied = min(remaining, inv_balance)
+            balance[inv_id] = inv_balance - applied
+            paid[inv_id] += applied
             remaining -= applied
 
         if remaining > 0.01:
