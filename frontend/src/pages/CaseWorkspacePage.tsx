@@ -40,10 +40,12 @@ export function CaseWorkspacePage() {
 
   function loadAll() {
     if (!caseId) return
-    api.getCase(caseId).then(setKase).catch((err) => setError(err.message))
-    api.listEvidence(caseId).then(setEvidence).catch((err) => setError(err.message))
-    api.listEvidenceCategories(caseId).then(setCategories).catch(() => undefined)
-    api.listInvestigations(caseId).then(setInvestigations).catch(() => undefined)
+    Promise.all([
+      api.getCase(caseId).then(setKase).catch((err) => setError(err.message)),
+      api.listEvidence(caseId).then(setEvidence).catch((err) => setError(err.message)),
+      api.listEvidenceCategories(caseId).then(setCategories).catch(() => undefined),
+      api.listInvestigations(caseId).then(setInvestigations).catch(() => undefined)
+    ])
   }
 
   useEffect(loadAll, [caseId])
