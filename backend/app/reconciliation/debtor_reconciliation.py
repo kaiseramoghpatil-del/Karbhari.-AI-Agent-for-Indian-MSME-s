@@ -57,22 +57,26 @@ def _debtor_key(name: str | None) -> str:
 
 def _dedupe_invoices(invoices: list[Invoice]) -> tuple[list[Invoice], list[DuplicateInvoice]]:
     seen: dict[str, Invoice] = {}
-    counts: dict[str, int] = defaultdict(int)
+    duplicates: dict[str, DuplicateInvoice] = {}
     for inv in invoices:
-        counts[inv.invoice_id] += 1
-        seen.setdefault(inv.invoice_id, inv)
+        inv_id = inv.invoice_id
+        if inv_id in seen:
+            if inv_id in duplicates:
+                dup = duplicates[inv_id]
+                dup.occurrences += 1
+                dup.excluded_amount += dup.amount
+            else:
+                amount = seen[inv_id].amount
+                duplicates[inv_id] = DuplicateInvoice(
+                    invoice_id=inv_id,
+                    amount=amount,
+                    occurrences=2,
+                    excluded_amount=amount,
+                )
+        else:
+            seen[inv_id] = inv
 
-    duplicates = [
-        DuplicateInvoice(
-            invoice_id=inv_id,
-            amount=seen[inv_id].amount,
-            occurrences=count,
-            excluded_amount=seen[inv_id].amount * (count - 1),
-        )
-        for inv_id, count in counts.items()
-        if count > 1
-    ]
-    return list(seen.values()), duplicates
+    return list(seen.values()), list(duplicates.values())
 
 
 def _reconcile_one_debtor(
