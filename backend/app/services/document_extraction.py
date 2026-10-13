@@ -79,6 +79,10 @@ def extract_text(file_path: Path, content_type: str | None, original_filename: s
         else:
             text = _extract_plain_text(data)
     except Exception as exc:  # noqa: BLE001
-        return f"[Could not extract text from this file: {exc}]"
+        # Even if we fail, we log and return a signal rather than throwing 500,
+        # so the LLM knows we tried but couldn't read it.
+        import logging
+        logging.exception(f"Failed to extract text from {original_filename}")
+        return f"[Failed to extract text: {exc!s}]"
 
     return _truncate(text)
