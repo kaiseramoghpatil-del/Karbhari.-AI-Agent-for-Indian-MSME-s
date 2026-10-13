@@ -4,8 +4,13 @@ from sqlmodel import Session
 from ..db import get_session
 from ..models.evidence import EVIDENCE_CATEGORIES, EvidenceRead
 from ..services import case_service, evidence_service
+from ..auth import verify_auth
 
-router = APIRouter(prefix="/api/cases/{case_id}/evidence", tags=["evidence"])
+router = APIRouter(
+    prefix="/api/cases/{case_id}/evidence",
+    tags=["evidence"],
+    dependencies=[Depends(verify_auth)]
+)
 
 
 def _require_case(session: Session, case_id: str):

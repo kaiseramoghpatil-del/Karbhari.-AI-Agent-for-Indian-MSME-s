@@ -11,6 +11,8 @@ from pathlib import Path
 
 _TEST_DATA_DIR = Path(tempfile.mkdtemp(prefix="karbhari_test_"))
 os.environ["KARBHARI_DATA_DIR"] = str(_TEST_DATA_DIR)
+os.environ["KARBHARI_USERNAME"] = "test_admin"
+os.environ["KARBHARI_PASSWORD"] = "test_secret"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -21,4 +23,5 @@ from app.main import app  # noqa: E402
 @pytest.fixture()
 def client() -> TestClient:
     with TestClient(app) as c:
+        c.auth = (os.environ.get("KARBHARI_USERNAME", "admin"), os.environ.get("KARBHARI_PASSWORD", "admin"))
         yield c

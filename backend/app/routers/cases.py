@@ -4,8 +4,9 @@ from sqlmodel import Session
 from ..db import get_session
 from ..models.case import CaseCreate, CaseRead
 from ..services import case_service
+from ..auth import verify_auth
 
-router = APIRouter(prefix="/api/cases", tags=["cases"])
+router = APIRouter(prefix="/api/cases", tags=["cases"], dependencies=[Depends(verify_auth)])
 
 
 @router.post("", response_model=CaseRead)
