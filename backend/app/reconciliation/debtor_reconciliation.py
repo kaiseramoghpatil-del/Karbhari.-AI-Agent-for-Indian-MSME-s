@@ -111,19 +111,40 @@ def _reconcile_one_debtor(
 
     # Tier 2: untagged receipts, FIFO oldest-open-invoice-first within this
     # debtor only, never applied to an invoice dated after the receipt.
+    unpaid_idx = 0
     for r in sorted(untagged, key=lambda x: x.date):
         remaining = r.amount
-        for inv in deduped_invoices:
-            if remaining <= 0:
-                break
+
+        # Start searching from unpaid_idx, but we might have to scan forward
+        # without updating unpaid_idx if some invoices are dated AFTER the receipt
+        # but earlier invoices are still unpaid.
+        curr_idx = unpaid_idx
+        while curr_idx < len(deduped_invoices) and remaining > 0:
+            inv = deduped_invoices[curr_idx]
+
             if inv.date > r.date:
-                continue
+                # Invoices are sorted by date. If this invoice is after the receipt,
+                # subsequent ones will be too. We break out for this receipt.
+                # We do NOT advance unpaid_idx because this invoice might still be unpaid.
+                break
+
             if balance[inv.invoice_id] <= 0:
+                # Fully paid.
+                # If we are at the very beginning of the unpaid window, advance the start.
+                if curr_idx == unpaid_idx:
+                    unpaid_idx += 1
+                curr_idx += 1
                 continue
+
             applied = min(remaining, balance[inv.invoice_id])
             balance[inv.invoice_id] -= applied
             paid[inv.invoice_id] += applied
             remaining -= applied
+
+            if balance[inv.invoice_id] <= 0:
+                if curr_idx == unpaid_idx:
+                    unpaid_idx += 1
+            curr_idx += 1
 
         if remaining > 0.01:
             unallocated.append(
