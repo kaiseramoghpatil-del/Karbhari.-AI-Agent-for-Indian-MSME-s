@@ -16,6 +16,8 @@ import logging
 import re
 import time
 
+from pydantic import ValidationError
+
 from ..llm.base import LLMClient, LLMError
 from ..models.evidence import Evidence
 from .prompts import INVESTIGATOR_SYSTEM_PROMPT
@@ -267,6 +269,6 @@ def _parse_findings(raw_findings: list) -> list[Finding]:
     for item in raw_findings:
         try:
             findings.append(Finding.model_validate(item))
-        except Exception:  # noqa: BLE001
+        except ValidationError:
             continue
     return findings
