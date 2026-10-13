@@ -139,7 +139,7 @@ def reconcile_drawing_power(facts: DrawingPowerInputs) -> ReconciliationResult:
             "sanctioned limit is the hard ceiling regardless of collateral value."
         )
 
-    comparison_basis: str = "none"
+    comparison_basis: Literal["reported_drawing_power", "current_outstanding", "none"] = "none"
     comparison_value: float | None = None
     if facts.reported_drawing_power is not None:
         comparison_basis = "reported_drawing_power"
@@ -162,7 +162,7 @@ def reconcile_drawing_power(facts: DrawingPowerInputs) -> ReconciliationResult:
 
     return ReconciliationResult(
         calculated_dp=round(calculated_dp, 2),
-        comparison_basis=comparison_basis,  # type: ignore[arg-type]
+        comparison_basis=comparison_basis,
         comparison_value=comparison_value,
         gap=round(gap, 2) if gap is not None else None,
         assumptions_used=assumptions,
