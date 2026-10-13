@@ -1,3 +1,3 @@
-from .factory import get_llm_client
+from .factory import get_llm_client as get_llm_client
 
 __all__ = ["get_llm_client"]
