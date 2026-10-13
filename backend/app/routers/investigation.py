@@ -4,8 +4,13 @@ from sqlmodel import Session
 from ..db import get_session
 from ..models.investigation import Investigation, InvestigationRead
 from ..services import case_service, investigation_service
+from ..auth import verify_auth
 
-router = APIRouter(prefix="/api/cases/{case_id}", tags=["investigation"])
+router = APIRouter(
+    prefix="/api/cases/{case_id}",
+    tags=["investigation"],
+    dependencies=[Depends(verify_auth)]
+)
 
 
 def _to_read(investigation: Investigation) -> InvestigationRead:
